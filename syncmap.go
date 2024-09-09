@@ -15,7 +15,7 @@ type TypeType interface {
 
 type PointerType[T TypeType] interface {
 	comparable
-	ID() string
+	GetID() string
 	Type() T
 }
 
@@ -91,7 +91,7 @@ func (s *PointerMap[K, V, T]) OfType(t T) iter.Seq2[K, V] {
 
 func (m *PointerMap[K, V, _]) GetByID(id string) (k K) {
 	for k := range m.m {
-		if k.ID() == id {
+		if k.GetID() == id {
 			return k
 		}
 	}
@@ -105,7 +105,7 @@ type MapType[K MapKey, V MapValue[T], T TypeType] map[K]V
 
 type MapValue[T TypeType] interface {
 	comparable
-	ID() string
+	GetID() string
 	Type() T
 }
 
