@@ -134,7 +134,7 @@ func (m *KeyValMap[K, V, _]) Exists(key K) bool {
 	return ok
 }
 
-// Get element with key
+// Get val with key
 func (m *KeyValMap[K, V, _]) Get(key K) V {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
@@ -142,7 +142,15 @@ func (m *KeyValMap[K, V, _]) Get(key K) V {
 	return m.m[key]
 }
 
-// Set map from map
+// Get whole map
+func (m *KeyValMap[K, V, _]) GetAll() map[K]V {
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
+
+	return m.m
+}
+
+// Set / Overwrite map from map
 func (m *KeyValMap[K, V, _]) Set(v map[K]V) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
@@ -150,7 +158,7 @@ func (m *KeyValMap[K, V, _]) Set(v map[K]V) {
 	m.m = v
 }
 
-// Add element to map
+// Add key / val to map
 func (m *KeyValMap[K, V, _]) Add(k K, v V) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
@@ -158,7 +166,7 @@ func (m *KeyValMap[K, V, _]) Add(k K, v V) {
 	m.m[k] = v
 }
 
-// Remove element from map
+// Remove key from map
 func (m *KeyValMap[K, V, _]) Remove(key K) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
@@ -174,7 +182,7 @@ func (m *KeyValMap[K, V, _]) Length() int {
 	return len(m.m)
 }
 
-// All iterate whole map
+// All iterate over whole map
 func (m *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		for k, v := range m.m {
