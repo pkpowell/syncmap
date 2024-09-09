@@ -25,10 +25,10 @@ type PointerType[T comparable] interface {
 	All()
 }
 
-func NewPointerMap[K PointerType[T], V PointerMapBoolType, T comparable]() PointerMap[K, V, T] {
-	return PointerMap[K, V, T]{
+func NewPointerMap[K PointerType[T], T comparable]() PointerMap[K, struct{}, T] {
+	return PointerMap[K, struct{}, T]{
 		mtx: sync.RWMutex{},
-		m:   make(map[K]V),
+		m:   make(map[K]struct{}),
 	}
 }
 
