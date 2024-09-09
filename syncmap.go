@@ -97,9 +97,10 @@ func (m *PointerMap[K, V, _]) GetByID(id string) (k K) {
 	return k
 }
 
-/////////////////////////////
+// ///////////////////////////
 // KeyValMap
-/////////////////////////////
+// ///////////////////////////
+type MapType[K MapKey, V MapValue[T], T TypeType] map[K]V
 
 type MapValue[T TypeType] interface {
 	comparable
@@ -113,16 +114,18 @@ type MapKey interface {
 
 type KeyValMap[K MapKey, V MapValue[T], T TypeType] struct {
 	mtx sync.RWMutex
-	m   map[K]V
+	m   MapType[K, V, T]
 }
 
+// NewKeyValMap create new empty map
 func NewKeyValMap[K MapKey, V MapValue[T], T TypeType]() KeyValMap[K, V, T] {
 	return KeyValMap[K, V, T]{
 		mtx: sync.RWMutex{},
-		m:   make(map[K]V),
+		m:   make(MapType[K, V, T]),
 	}
 }
 
+// Exists check if key exists
 func (m *KeyValMap[K, V, _]) Exists(key K) bool {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
@@ -131,6 +134,7 @@ func (m *KeyValMap[K, V, _]) Exists(key K) bool {
 	return ok
 }
 
+// Get element with key
 func (m *KeyValMap[K, V, _]) Get(key K) V {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
@@ -138,20 +142,31 @@ func (m *KeyValMap[K, V, _]) Get(key K) V {
 	return m.m[key]
 }
 
-func (m *KeyValMap[K, V, _]) Set(k K, v V) {
+// Set map from map
+func (m *KeyValMap[K, V, _]) Set(v map[K]V) {
+	m.mtx.Lock()
+	defer m.mtx.Unlock()
+
+	m.m = v
+}
+
+// Add element to map
+func (m *KeyValMap[K, V, _]) Add(k K, v V) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
 	m.m[k] = v
 }
 
-func (m *KeyValMap[K, V, _]) Del(key K) {
+// Remove element from map
+func (m *KeyValMap[K, V, _]) Remove(key K) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
 	delete(m.m, key)
 }
 
+// Length of map
 func (m *KeyValMap[K, V, _]) Length() int {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
@@ -159,6 +174,7 @@ func (m *KeyValMap[K, V, _]) Length() int {
 	return len(m.m)
 }
 
+// All iterate whole map
 func (m *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		for k, v := range m.m {
@@ -169,6 +185,7 @@ func (m *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
 	}
 }
 
+// All iterate over elements with type T
 func (m *KeyValMap[K, V, T]) OfType(t T) iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		for k, v := range m.m {
