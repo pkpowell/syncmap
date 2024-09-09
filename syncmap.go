@@ -28,6 +28,7 @@ type PointerMap[K PointerType[T], V PointerBoolType, T TypeType] struct {
 	m   map[K]V
 }
 
+// NewPointerMap init pointer map with type field T
 func NewPointerMap[K PointerType[T], T TypeType]() PointerMap[K, struct{}, T] {
 	return PointerMap[K, struct{}, T]{
 		mtx: sync.RWMutex{},
