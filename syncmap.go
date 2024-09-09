@@ -39,7 +39,8 @@ func (m *PointerMap[K, V, _]) Exists(key K) bool {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
-	return m.m[key] == V{}
+	_, ok := m.m[key]
+	return ok
 }
 
 func (m *PointerMap[K, V, _]) Add(key K) {
@@ -57,8 +58,8 @@ func (m *PointerMap[K, V, _]) Remove(key K) {
 }
 
 func (m *PointerMap[K, V, _]) Length() int {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
 
 	return len(m.m)
 }
@@ -115,33 +116,52 @@ type KeyValMap[K MapKey, V MapValue[T], T TypeType] struct {
 	m   map[K]V
 }
 
-func (m *KeyValMap[K, V, T]) Get(key K) V {
+func NewKeyValMap[K MapKey, V MapValue[T], T TypeType]() KeyValMap[K, V, T] {
+	return KeyValMap[K, V, T]{
+		mtx: sync.RWMutex{},
+		m:   make(map[K]V),
+	}
+}
+
+func (m *KeyValMap[K, V, _]) Exists(key K) bool {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
+
+	_, ok := m.m[key]
+	return ok
+}
+
+func (m *KeyValMap[K, V, _]) Get(key K) V {
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
+
 	return m.m[key]
 }
 
-func (m *KeyValMap[K, V, _]) Set(key K, value V) {
+func (m *KeyValMap[K, V, _]) Set(k K, v V) {
 	m.mtx.Lock()
-	m.m[key] = value
-	m.mtx.Unlock()
+	defer m.mtx.Unlock()
+
+	m.m[k] = v
 }
 
 func (m *KeyValMap[K, V, _]) Del(key K) {
 	m.mtx.Lock()
+	defer m.mtx.Unlock()
+
 	delete(m.m, key)
-	m.mtx.Unlock()
 }
 
 func (m *KeyValMap[K, V, _]) Length() int {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
+
 	return len(m.m)
 }
 
-func (s *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
+func (m *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
-		for k, v := range s.m {
+		for k, v := range m.m {
 			if !yield(k, v) {
 				return
 			}
@@ -149,9 +169,9 @@ func (s *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
 	}
 }
 
-func (s *KeyValMap[K, V, T]) OfType(t T) iter.Seq2[K, V] {
+func (m *KeyValMap[K, V, T]) OfType(t T) iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
-		for k, v := range s.m {
+		for k, v := range m.m {
 			if v.Type() == t {
 				if !yield(k, v) {
 					return
