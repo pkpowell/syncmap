@@ -60,14 +60,14 @@ func (m *PointerMap[K, V, _]) Length() int {
 	return len(m.m)
 }
 
-func (m *PointerMap[K, V, T]) OfType(t T) (k K) {
-	for k := range m.m {
-		if k.Type() == t {
-			return k
-		}
-	}
-	return k
-}
+// func (m *PointerMap[K, V, T]) OfType(t T) (k K) {
+// 	for k := range m.m {
+// 		if k.Type() == t {
+// 			return k
+// 		}
+// 	}
+// 	return k
+// }
 
 // All is an iterator over the elements of s.
 func (s *PointerMap[K, V, _]) All() iter.Seq2[K, V] {
@@ -75,6 +75,19 @@ func (s *PointerMap[K, V, _]) All() iter.Seq2[K, V] {
 		for k, v := range s.m {
 			if !yield(k, v) {
 				return
+			}
+		}
+	}
+}
+
+// All is an iterator over the elements of s.
+func (s *PointerMap[K, V, T]) OfType(t T) iter.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		for k, v := range s.m {
+			if k.Type() == t {
+				if !yield(k, v) {
+					return
+				}
 			}
 		}
 	}
