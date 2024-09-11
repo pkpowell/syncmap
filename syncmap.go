@@ -19,24 +19,20 @@ type PointerType[T TypeType] interface {
 	Type() T
 }
 
-type PointerBoolType interface {
-	struct{}
-}
-
-type PointerMap[K PointerType[T], V PointerBoolType, T TypeType] struct {
+type PointerMap[K PointerType[T], T TypeType] struct {
 	mtx sync.RWMutex
-	m   map[K]V
+	m   map[K]struct{}
 }
 
 // NewPointerMap init pointer map with type field T
-func NewPointerMap[K PointerType[T], T TypeType]() PointerMap[K, struct{}, T] {
-	return PointerMap[K, struct{}, T]{
+func NewPointerMap[K PointerType[T], T TypeType]() PointerMap[K, T] {
+	return PointerMap[K, T]{
 		mtx: sync.RWMutex{},
 		m:   make(map[K]struct{}),
 	}
 }
 
-func (m *PointerMap[K, V, _]) Exists(key K) bool {
+func (m *PointerMap[K, _]) Exists(key K) bool {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
@@ -44,21 +40,21 @@ func (m *PointerMap[K, V, _]) Exists(key K) bool {
 	return ok
 }
 
-func (m *PointerMap[K, V, _]) Add(key K) {
+func (m *PointerMap[K, _]) Add(key K) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
-	m.m[key] = V{}
+	m.m[key] = struct{}{}
 }
 
-func (m *PointerMap[K, V, _]) Remove(key K) {
+func (m *PointerMap[K, _]) Remove(key K) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
 	delete(m.m, key)
 }
 
-func (m *PointerMap[K, V, _]) Length() int {
+func (m *PointerMap[K, _]) Length() int {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
@@ -66,10 +62,10 @@ func (m *PointerMap[K, V, _]) Length() int {
 }
 
 // All is an iterator over the elements of s.
-func (s *PointerMap[K, V, _]) All() iter.Seq2[K, V] {
-	return func(yield func(K, V) bool) {
-		for k, v := range s.m {
-			if !yield(k, v) {
+func (s *PointerMap[K, _]) All() iter.Seq[K] {
+	return func(yield func(K) bool) {
+		for k := range s.m {
+			if !yield(k) {
 				return
 			}
 		}
@@ -77,11 +73,11 @@ func (s *PointerMap[K, V, _]) All() iter.Seq2[K, V] {
 }
 
 // OfType is an iterator over the elements of s with type t.
-func (s *PointerMap[K, V, T]) OfType(t T) iter.Seq2[K, V] {
-	return func(yield func(K, V) bool) {
-		for k, v := range s.m {
+func (s *PointerMap[K, T]) OfType(t T) iter.Seq[K] {
+	return func(yield func(K) bool) {
+		for k := range s.m {
 			if k.Type() == t {
-				if !yield(k, v) {
+				if !yield(k) {
 					return
 				}
 			}
@@ -89,7 +85,7 @@ func (s *PointerMap[K, V, T]) OfType(t T) iter.Seq2[K, V] {
 	}
 }
 
-func (m *PointerMap[K, V, _]) GetByID(id string) (k K) {
+func (m *PointerMap[K, _]) GetByID(id string) (k K) {
 	for k := range m.m {
 		if k.GetID() == id {
 			return k
