@@ -104,7 +104,6 @@ type MapValue[T TypeType] interface {
 	GetID() string
 	Type() T
 	Del(bool)
-	UnDel(bool)
 }
 
 type MapKey interface {
