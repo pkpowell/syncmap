@@ -103,7 +103,8 @@ type MapValue[T TypeType] interface {
 	comparable
 	GetID() string
 	Type() T
-	Delete(bool)
+	Del(bool)
+	UnDel(bool)
 }
 
 type MapKey interface {
@@ -170,6 +171,22 @@ func (m *KeyValMap[K, V, _]) Remove(key K) {
 	defer m.mtx.Unlock()
 
 	delete(m.m, key)
+}
+
+// Mark key as deleted
+func (m *KeyValMap[K, V, _]) Delete(key K) {
+	m.mtx.Lock()
+	defer m.mtx.Unlock()
+
+	m.m[key].Del(true)
+}
+
+// Mark key as deleted
+func (m *KeyValMap[K, V, _]) UnDelete(key K) {
+	m.mtx.Lock()
+	defer m.mtx.Unlock()
+
+	m.m[key].Del(false)
 }
 
 // Length of map
