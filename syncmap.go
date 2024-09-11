@@ -181,7 +181,7 @@ func (m *KeyValMap[K, V, _]) Delete(key K) {
 	m.m[key].Del(true)
 }
 
-// Mark key as deleted
+// Mark key as not deleted
 func (m *KeyValMap[K, V, _]) UnDelete(key K) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
