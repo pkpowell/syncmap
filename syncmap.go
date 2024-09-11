@@ -103,7 +103,7 @@ type MapValue[T TypeType] interface {
 	comparable
 	GetID() string
 	Type() T
-	Deleted(bool)
+	Delete(bool)
 }
 
 type MapKey interface {
