@@ -25,8 +25,8 @@ type PointerMap[K PointerType[T], T TypeType] struct {
 }
 
 // NewPointerMap init pointer map with type field T
-func NewPointerMap[K PointerType[T], T TypeType]() PointerMap[K, T] {
-	return PointerMap[K, T]{
+func NewPointerMap[K PointerType[T], T TypeType]() *PointerMap[K, T] {
+	return &PointerMap[K, T]{
 		mtx: &sync.RWMutex{},
 		m:   make(map[K]struct{}),
 	}
@@ -54,7 +54,7 @@ func (m *PointerMap[K, _]) Remove(key K) {
 	delete(m.m, key)
 }
 
-func (m *PointerMap[K, _]) Length() int {
+func (m *PointerMap[_, _]) Length() int {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
@@ -116,15 +116,15 @@ type KeyValMap[K MapKey, V MapValue[T], T TypeType] struct {
 }
 
 // NewKeyValMap create new empty map
-func NewKeyValMap[K MapKey, V MapValue[T], T TypeType]() KeyValMap[K, V, T] {
-	return KeyValMap[K, V, T]{
+func NewKeyValMap[K MapKey, V MapValue[T], T TypeType]() *KeyValMap[K, V, T] {
+	return &KeyValMap[K, V, T]{
 		mtx: &sync.RWMutex{},
 		m:   make(MapType[K, V, T]),
 	}
 }
 
 // Exists check if key exists
-func (m *KeyValMap[K, V, _]) Exists(key K) bool {
+func (m *KeyValMap[K, _, _]) Exists(key K) bool {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
@@ -165,7 +165,7 @@ func (m *KeyValMap[K, V, _]) Add(k K, v V) {
 }
 
 // Remove key from map
-func (m *KeyValMap[K, V, _]) Remove(key K) {
+func (m *KeyValMap[K, _, _]) Remove(key K) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
@@ -173,7 +173,7 @@ func (m *KeyValMap[K, V, _]) Remove(key K) {
 }
 
 // Mark key as deleted
-func (m *KeyValMap[K, V, _]) Delete(key K) {
+func (m *KeyValMap[K, _, _]) Delete(key K) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
@@ -181,7 +181,7 @@ func (m *KeyValMap[K, V, _]) Delete(key K) {
 }
 
 // Mark key as not deleted
-func (m *KeyValMap[K, V, _]) UnDelete(key K) {
+func (m *KeyValMap[K, _, _]) UnDelete(key K) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
@@ -189,7 +189,7 @@ func (m *KeyValMap[K, V, _]) UnDelete(key K) {
 }
 
 // Length of map
-func (m *KeyValMap[K, V, _]) Length() int {
+func (m *KeyValMap[K, _, _]) Length() int {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
