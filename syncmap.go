@@ -20,14 +20,14 @@ type PointerType[T TypeType] interface {
 }
 
 type PointerMap[K PointerType[T], T TypeType] struct {
-	mtx sync.RWMutex
+	mtx *sync.RWMutex
 	m   map[K]struct{}
 }
 
 // NewPointerMap init pointer map with type field T
 func NewPointerMap[K PointerType[T], T TypeType]() PointerMap[K, T] {
 	return PointerMap[K, T]{
-		mtx: sync.RWMutex{},
+		mtx: &sync.RWMutex{},
 		m:   make(map[K]struct{}),
 	}
 }
@@ -61,7 +61,7 @@ func (m *PointerMap[K, _]) Length() int {
 	return len(m.m)
 }
 
-// All is an iterator over the elements of s.
+// All is an iterator over the elements of s
 func (s *PointerMap[K, _]) All() iter.Seq[K] {
 	return func(yield func(K) bool) {
 		for k := range s.m {
@@ -72,7 +72,7 @@ func (s *PointerMap[K, _]) All() iter.Seq[K] {
 	}
 }
 
-// OfType is an iterator over the elements of s with type t.
+// OfType is an iterator over the elements of s with type t
 func (s *PointerMap[K, T]) OfType(t T) iter.Seq[K] {
 	return func(yield func(K) bool) {
 		for k := range s.m {
@@ -111,14 +111,14 @@ type MapKey interface {
 }
 
 type KeyValMap[K MapKey, V MapValue[T], T TypeType] struct {
-	mtx sync.RWMutex
+	mtx *sync.RWMutex
 	m   MapType[K, V, T]
 }
 
 // NewKeyValMap create new empty map
 func NewKeyValMap[K MapKey, V MapValue[T], T TypeType]() KeyValMap[K, V, T] {
 	return KeyValMap[K, V, T]{
-		mtx: sync.RWMutex{},
+		mtx: &sync.RWMutex{},
 		m:   make(MapType[K, V, T]),
 	}
 }
