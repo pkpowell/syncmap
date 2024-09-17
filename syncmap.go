@@ -64,6 +64,9 @@ func (m *PointerMap[_, _]) Length() int {
 // All is an iterator over the elements of s
 func (s *PointerMap[K, _]) All() iter.Seq[K] {
 	return func(yield func(K) bool) {
+		s.mtx.RLock()
+		defer s.mtx.RUnlock()
+
 		for k := range s.m {
 			if !yield(k) {
 				return
@@ -75,6 +78,9 @@ func (s *PointerMap[K, _]) All() iter.Seq[K] {
 // OfType is an iterator over the elements of s with type t
 func (s *PointerMap[K, T]) OfType(t T) iter.Seq[K] {
 	return func(yield func(K) bool) {
+		s.mtx.RLock()
+		defer s.mtx.RUnlock()
+
 		for k := range s.m {
 			if k.Type() == t {
 				if !yield(k) {
