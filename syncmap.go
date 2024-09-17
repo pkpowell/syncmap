@@ -199,6 +199,9 @@ func (m *KeyValMap[K, _, _]) Length() int {
 // All iterate over whole map
 func (m *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
+		m.mtx.RLock()
+		defer m.mtx.RUnlock()
+
 		for k, v := range m.m {
 			if !yield(k, v) {
 				return
@@ -210,6 +213,9 @@ func (m *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
 // All iterate over elements with type T
 func (m *KeyValMap[K, V, T]) OfType(t T) iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
+		m.mtx.RLock()
+		defer m.mtx.RUnlock()
+
 		for k, v := range m.m {
 			if v.Type() == t {
 				if !yield(k, v) {
