@@ -149,6 +149,15 @@ func (m *KeyValMap[K, V, _]) Get(key K) V {
 	return m.m[key]
 }
 
+// Get val with key
+func (m *KeyValMap[K, V, _]) GetP(key K, p V) (ok bool) {
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
+
+	p, ok = m.m[key]
+	return
+}
+
 // Get whole map
 func (m *KeyValMap[K, V, _]) GetAll() map[K]V {
 	m.mtx.RLock()
