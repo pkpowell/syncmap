@@ -62,12 +62,12 @@ func (m *PointerMap[_, _]) Length() int {
 }
 
 // All is an iterator over the elements of s
-func (s *PointerMap[K, _]) All() iter.Seq[K] {
-	return func(yield func(K) bool) {
-		s.mtx.RLock()
-		defer s.mtx.RUnlock()
+func (m *PointerMap[K, _]) All() iter.Seq[K] {
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
 
-		for k := range s.m {
+	return func(yield func(K) bool) {
+		for k := range m.m {
 			if !yield(k) {
 				return
 			}
@@ -76,12 +76,12 @@ func (s *PointerMap[K, _]) All() iter.Seq[K] {
 }
 
 // OfType is an iterator over the elements of s with type t
-func (s *PointerMap[K, T]) OfType(t T) iter.Seq[K] {
-	return func(yield func(K) bool) {
-		s.mtx.RLock()
-		defer s.mtx.RUnlock()
+func (m *PointerMap[K, T]) OfType(t T) iter.Seq[K] {
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
 
-		for k := range s.m {
+	return func(yield func(K) bool) {
+		for k := range m.m {
 			if k.Type() == t {
 				if !yield(k) {
 					return
@@ -92,6 +92,9 @@ func (s *PointerMap[K, T]) OfType(t T) iter.Seq[K] {
 }
 
 func (m *PointerMap[K, _]) GetByID(id string) (k K) {
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
+
 	for k := range m.m {
 		if k.GetID() == id {
 			return k
@@ -204,10 +207,10 @@ func (m *KeyValMap[K, _, _]) Length() int {
 
 // All iterate over whole map
 func (m *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
-	return func(yield func(K, V) bool) {
-		m.mtx.RLock()
-		defer m.mtx.RUnlock()
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
 
+	return func(yield func(K, V) bool) {
 		for k, v := range m.m {
 			if !yield(k, v) {
 				return
@@ -218,10 +221,10 @@ func (m *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
 
 // All iterate over elements with type T
 func (m *KeyValMap[K, V, T]) OfType(t T) iter.Seq2[K, V] {
-	return func(yield func(K, V) bool) {
-		m.mtx.RLock()
-		defer m.mtx.RUnlock()
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
 
+	return func(yield func(K, V) bool) {
 		for k, v := range m.m {
 			if v.Type() == t {
 				if !yield(k, v) {
