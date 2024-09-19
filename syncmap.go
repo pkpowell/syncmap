@@ -63,10 +63,10 @@ func (m *PointerMap[_, _]) Length() int {
 
 // All is an iterator over the elements of s
 func (m *PointerMap[K, _]) All() iter.Seq[K] {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
-
 	return func(yield func(K) bool) {
+		m.mtx.RLock()
+		defer m.mtx.RUnlock()
+
 		for k := range m.m {
 			if !yield(k) {
 				return
@@ -77,10 +77,10 @@ func (m *PointerMap[K, _]) All() iter.Seq[K] {
 
 // OfType is an iterator over the elements of s with type t
 func (m *PointerMap[K, T]) OfType(t T) iter.Seq[K] {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
-
 	return func(yield func(K) bool) {
+		m.mtx.RLock()
+		defer m.mtx.RUnlock()
+
 		for k := range m.m {
 			if k.Type() == t {
 				if !yield(k) {
@@ -169,33 +169,34 @@ func (m *KeyValMap[K, V, _]) GetAll() map[K]V {
 // Set / Overwrite map from map
 func (m *KeyValMap[K, V, _]) Set(v map[K]V) {
 	m.mtx.Lock()
-	defer m.mtx.Unlock()
-
 	m.m = v
+	m.mtx.Unlock()
+
 }
 
 // Add key / val to map
 func (m *KeyValMap[K, V, _]) Add(k K, v V) {
 	m.mtx.Lock()
-	defer m.mtx.Unlock()
 
 	m.m[k] = v
+
+	m.mtx.Unlock()
 }
 
 // Remove key from map
 func (m *KeyValMap[K, _, _]) Remove(key K) {
 	m.mtx.Lock()
-	defer m.mtx.Unlock()
-
 	delete(m.m, key)
+
+	m.mtx.Unlock()
 }
 
 // Mark key as deleted
 func (m *KeyValMap[K, _, _]) Delete(key K) {
 	m.mtx.Lock()
-	defer m.mtx.Unlock()
-
 	m.m[key].Del(true)
+
+	m.mtx.Unlock()
 }
 
 // Mark key as not deleted
@@ -216,10 +217,10 @@ func (m *KeyValMap[K, _, _]) Length() int {
 
 // All iterate over whole map
 func (m *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
-
 	return func(yield func(K, V) bool) {
+		m.mtx.RLock()
+		defer m.mtx.RUnlock()
+
 		for k, v := range m.m {
 			if !yield(k, v) {
 				return
@@ -230,10 +231,10 @@ func (m *KeyValMap[K, V, _]) All() iter.Seq2[K, V] {
 
 // All iterate over elements with type T
 func (m *KeyValMap[K, V, T]) OfType(t T) iter.Seq2[K, V] {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
-
 	return func(yield func(K, V) bool) {
+		m.mtx.RLock()
+		defer m.mtx.RUnlock()
+
 		for k, v := range m.m {
 			if v.Type() == t {
 				if !yield(k, v) {
