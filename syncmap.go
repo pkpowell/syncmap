@@ -124,7 +124,12 @@ type Collection[K MapKey, V MapValue[T], T TypeType] struct {
 	m   MapType[K, V, T]
 }
 
-// NewCollection create new empty map
+// func (mt *Collection[K, V, T]) Del(v V) (t T) {
+// 	v.Del(true)
+// 	return v
+// }
+
+// NewCollection create new empty m: map[K]V
 func NewCollection[K MapKey, V MapValue[T], T TypeType]() *Collection[K, V, T] {
 	return &Collection[K, V, T]{
 		mtx: &sync.RWMutex{},
