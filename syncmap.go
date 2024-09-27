@@ -129,7 +129,7 @@ type Bool struct{}
 func (t *Bool) GetID() string {
 	return ""
 }
-func (t *Bool) Type() string {
+func (t *Bool) FilterType() string {
 	return ""
 }
 func (t *Bool) Del(bool) {}
