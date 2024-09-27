@@ -16,7 +16,7 @@ type TypeType interface {
 type PointerType[T TypeType] interface {
 	comparable
 	GetID() string
-	Type() T
+	FilterType() T
 }
 
 type PointerMap[K PointerType[T], T TypeType] struct {
@@ -61,7 +61,7 @@ func (m *PointerMap[_, _]) Length() int {
 	return len(m.m)
 }
 
-// All is an iterator over the elements of s
+// All iterates over the elements of K
 func (m *PointerMap[K, _]) All() iter.Seq[K] {
 	return func(yield func(K) bool) {
 		m.mtx.RLock()
@@ -82,7 +82,7 @@ func (m *PointerMap[K, T]) OfType(t T) iter.Seq[K] {
 		defer m.mtx.RUnlock()
 
 		for k := range m.m {
-			if k.Type() == t {
+			if k.FilterType() == t {
 				if !yield(k) {
 					return
 				}
@@ -111,7 +111,7 @@ type MapType[K MapKey, V MapValue[T], T TypeType] map[K]V
 type MapValue[T TypeType] interface {
 	comparable
 	GetID() string
-	Type() T
+	FilterType() T
 	Del(bool)
 }
 
@@ -228,7 +228,7 @@ func (m *Collection[K, _, _]) Length() int {
 	return len(m.m)
 }
 
-// All iterate over whole map
+// All iterates over all elements of K
 func (m *Collection[K, V, _]) All() iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		m.mtx.RLock()
@@ -242,14 +242,14 @@ func (m *Collection[K, V, _]) All() iter.Seq2[K, V] {
 	}
 }
 
-// All iterate over elements with type T
+// All iterates over elements with type T
 func (m *Collection[K, V, T]) OfType(t T) iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		m.mtx.RLock()
 		defer m.mtx.RUnlock()
 
 		for k, v := range m.m {
-			if v.Type() == t {
+			if v.FilterType() == t {
 				if !yield(k, v) {
 					return
 				}
