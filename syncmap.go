@@ -250,3 +250,24 @@ func (m *Collection[K, V, T]) OfType(t T) iter.Seq2[K, V] {
 		}
 	}
 }
+
+// NewCollection create new empty m: map[K]V
+func NewCollection2[K MapKey, V MapValue[T], T TypeType]() *Collection[K, V, T] {
+	c := &struct {
+		Collection[K, V, T]
+		_mtx sync.RWMutex
+		_m   MapType[K, V, T]
+	}{
+		_mtx: sync.RWMutex{},
+		_m:   make(MapType[K, V, T]),
+	}
+
+	x := &c.Collection
+	x.mtx = &c._mtx
+	x.m = c._m
+	return x
+	// return &Collection[K, V, T]{
+	// 	mtx: &sync.RWMutex{},
+	// 	m:   make(MapType[K, V, T]),
+	// }
+}
