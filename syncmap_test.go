@@ -62,3 +62,12 @@ func BenchmarkCollectionAdd(b *testing.B) {
 		})
 	}
 }
+func BenchmarkCollectionGet(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		c.Get(fmt.Sprintf("test-%d", i))
+	}
+}
+func BenchmarkGet(b *testing.B) {
+	b.Run("add", BenchmarkCollectionAdd)
+	b.Run("get", BenchmarkCollectionGet)
+}
