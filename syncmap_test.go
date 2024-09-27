@@ -10,6 +10,8 @@ type TestType struct {
 	Array []int
 }
 
+type TestBool struct{}
+
 func (t *TestType) GetID() string {
 	return t.Field
 }
@@ -22,6 +24,12 @@ func (t *TestType) IDX() string {
 }
 
 func (t *TestType) Del(bool) {}
+func (t *TestBool) GetID()   {}
+
+func (t *TestBool) Type() {}
+func (t *TestBool) IDX()  {}
+
+func (t *TestBool) Del(bool) {}
 
 var (
 	p  = NewPointerMap[*TestType]()
@@ -32,6 +40,14 @@ var (
 func BenchmarkPointerMapAdd(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		p.Add(&TestType{
+			Field: fmt.Sprintf("test-%d", i),
+			Array: []int{i, 2, 3},
+		})
+	}
+}
+func BenchmarkCollBoolAdd(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		pc.Add(struct{}{}, &TestType{
 			Field: fmt.Sprintf("test-%d", i),
 			Array: []int{i, 2, 3},
 		})
