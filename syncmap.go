@@ -124,6 +124,16 @@ type Collection[K MapKey, V MapValue[T], T TypeType] struct {
 	m   MapType[K, V, T]
 }
 
+type Bool struct{}
+
+func (t *Bool) GetID() string {
+	return ""
+}
+func (t *Bool) Type() string {
+	return ""
+}
+func (t *Bool) Del(bool) {}
+
 // func (mt *Collection[K, V, T]) Del(v V) (t T) {
 // 	v.Del(true)
 // 	return v
@@ -177,15 +187,12 @@ func (m *Collection[K, V, _]) Set(v map[K]V) {
 	m.mtx.Lock()
 	m.m = v
 	m.mtx.Unlock()
-
 }
 
 // Add key / val to map
 func (m *Collection[K, V, _]) Add(k K, v V) {
 	m.mtx.Lock()
-
 	m.m[k] = v
-
 	m.mtx.Unlock()
 }
 
