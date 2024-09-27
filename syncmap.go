@@ -129,9 +129,11 @@ type Bool struct{}
 func (t *Bool) GetID() string {
 	return ""
 }
+
 func (t *Bool) FilterType() string {
 	return ""
 }
+
 func (t *Bool) Del(bool) {}
 
 // func (mt *Collection[K, V, T]) Del(v V) (t T) {
