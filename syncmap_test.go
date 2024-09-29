@@ -18,9 +18,9 @@ func (t *TestType) GetID() string {
 	return t.Field
 }
 
-func (t *TestType) FilterType() string {
-	return t.Field
-}
+//	func (t *TestType) FilterType() string {
+//		return t.Field
+//	}
 func (t *TestType) IDX() string {
 	return t.Field
 }
@@ -30,17 +30,17 @@ func (t *ZTPeerID) GetID() string {
 	return t.Address
 }
 
-func (t *ZTPeerID) FilterType() string {
-	return t.Address
-}
+//	func (t *ZTPeerID) FilterType() string {
+//		return t.Address
+//	}
 func (t *ZTPeerID) IDX() string {
 	return t.Address
 }
 
 func (t *ZTPeerID) Del(bool) {}
 
-func (t *TestBool) FilterType() {}
-func (t *TestBool) IDX()        {}
+// func (t *TestBool) FilterType() {}
+func (t *TestBool) IDX() {}
 
 // func (t *TestBool) Type() {}
 // func (t *TestBool) IDX()  {}
@@ -50,7 +50,7 @@ func (t *TestBool) IDX()        {}
 var (
 	p = NewPointerMap[*TestType]()
 	// pc = NewCollection[*TestType, *TestBool, string]()
-	c = NewCollection[string, *TestType, string]()
+	c = NewCollection[string, *TestType]()
 )
 
 func BenchmarkPointerMapAdd(b *testing.B) {
@@ -249,33 +249,33 @@ type ZTPeerID struct {
 	// TimeStamp int64 `cbor:"TimeStamp" json:"timeStamp"`
 }
 type Device struct {
-	mtx                      *sync.Mutex                            `cbor:"-" json:"-"`
-	ID                       string                                 `cbor:"ID" json:"id"`
-	Hostname                 string                                 `cbor:"HostName" json:"hostname"`
-	DisplayName              string                                 `cbor:"DisplayName" json:"displayName,omitempty"`
-	MachineModel             string                                 `cbor:"MachineModel" json:"machineModel"`
-	LastSyncDateTime         time.Time                              `cbor:"LastSyncDateTime" json:"lastSyncDateTime,omitempty"`
-	Added                    time.Time                              `cbor:"Added" json:"added,omitempty"`
-	Serial                   string                                 `cbor:"Serial" json:"serial"`
-	HASH                     string                                 `cbor:"HASH" json:"hash" hash:"ignore"`
-	HostInfo                 InfoStat                               `cbor:"Hostinfo" json:"hostinfo,omitempty"`
-	Uptime                   uint64                                 `cbor:"Uptime" json:"uptime,omitempty" hash:"ignore"`
-	LastSeen                 int64                                  `cbor:"LastSeen" json:"lastseen,omitempty" hash:"ignore"`
-	OSSoftware               []SPSoftwareDataType                   `cbor:"OSSoftware" json:"osSoftware,omitempty"`
-	TotalMem                 uint64                                 `cbor:"TotalMem" json:"totalMem,omitempty"`
-	UserData                 map[string]*User                       `cbor:"UserData" json:"userData"`
-	AppVersion               string                                 `cbor:"AppVersion" json:"appVersion,omitempty"`
-	BuildDate                string                                 `cbor:"BuildDate" json:"buildDate,omitempty"`
-	GoVersion                string                                 `cbor:"GoVersion" json:"goVersion,omitempty"`
-	Zerotier                 *Zerotier                              `cbor:"Zerotier" json:"zerotier,omitempty"`
-	ZTPeers                  *Collection[string, *ZTPeerID, string] `cbor:"-" json:"-" hash:"ignore"`
-	ZTPeerData               map[string]*ZTPeerID                   `cbor:"ZTPeers" json:"ztPeers,omitempty" hash:"ignore"`
-	Retired                  bool                                   `cbor:"Retired" json:"retired" hash:"ignore"`
-	IntuneUUID               string                                 `cbor:"IntuneUUID" json:"intuneUUID"`
-	WiFiMacAddress           string                                 `cbor:"WiFiMacAddress" json:"wiFiMacAddress"`
-	EthernetMACAddress       string                                 `cbor:"EthernetMACAddress" json:"ethernetMACAddress"`
-	TotalStorageSpaceInBytes int                                    `cbor:"TotalStorageSpaceInBytes" json:"totalStorageSpaceInBytes"`
-	FreeStorageSpaceInBytes  int                                    `cbor:"FreeStorageSpaceInBytes" json:"freeStorageSpaceInBytes"`
+	mtx                      *sync.Mutex                    `cbor:"-" json:"-"`
+	ID                       string                         `cbor:"ID" json:"id"`
+	Hostname                 string                         `cbor:"HostName" json:"hostname"`
+	DisplayName              string                         `cbor:"DisplayName" json:"displayName,omitempty"`
+	MachineModel             string                         `cbor:"MachineModel" json:"machineModel"`
+	LastSyncDateTime         time.Time                      `cbor:"LastSyncDateTime" json:"lastSyncDateTime,omitempty"`
+	Added                    time.Time                      `cbor:"Added" json:"added,omitempty"`
+	Serial                   string                         `cbor:"Serial" json:"serial"`
+	HASH                     string                         `cbor:"HASH" json:"hash" hash:"ignore"`
+	HostInfo                 InfoStat                       `cbor:"Hostinfo" json:"hostinfo,omitempty"`
+	Uptime                   uint64                         `cbor:"Uptime" json:"uptime,omitempty" hash:"ignore"`
+	LastSeen                 int64                          `cbor:"LastSeen" json:"lastseen,omitempty" hash:"ignore"`
+	OSSoftware               []SPSoftwareDataType           `cbor:"OSSoftware" json:"osSoftware,omitempty"`
+	TotalMem                 uint64                         `cbor:"TotalMem" json:"totalMem,omitempty"`
+	UserData                 map[string]*User               `cbor:"UserData" json:"userData"`
+	AppVersion               string                         `cbor:"AppVersion" json:"appVersion,omitempty"`
+	BuildDate                string                         `cbor:"BuildDate" json:"buildDate,omitempty"`
+	GoVersion                string                         `cbor:"GoVersion" json:"goVersion,omitempty"`
+	Zerotier                 *Zerotier                      `cbor:"Zerotier" json:"zerotier,omitempty"`
+	ZTPeers                  *Collection[string, *ZTPeerID] `cbor:"-" json:"-" hash:"ignore"`
+	ZTPeerData               map[string]*ZTPeerID           `cbor:"ZTPeers" json:"ztPeers,omitempty" hash:"ignore"`
+	Retired                  bool                           `cbor:"Retired" json:"retired" hash:"ignore"`
+	IntuneUUID               string                         `cbor:"IntuneUUID" json:"intuneUUID"`
+	WiFiMacAddress           string                         `cbor:"WiFiMacAddress" json:"wiFiMacAddress"`
+	EthernetMACAddress       string                         `cbor:"EthernetMACAddress" json:"ethernetMACAddress"`
+	TotalStorageSpaceInBytes int                            `cbor:"TotalStorageSpaceInBytes" json:"totalStorageSpaceInBytes"`
+	FreeStorageSpaceInBytes  int                            `cbor:"FreeStorageSpaceInBytes" json:"freeStorageSpaceInBytes"`
 }
 
 type ManagedDevice struct {
