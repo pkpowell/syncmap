@@ -5,10 +5,6 @@ import (
 	"sync"
 )
 
-type TypeType interface {
-	comparable
-}
-
 /////////////////////////////
 // PointerMap
 /////////////////////////////
@@ -16,7 +12,6 @@ type TypeType interface {
 type PointerType interface {
 	comparable
 	GetID() string
-	// FilterType() T
 }
 
 type PointerMap[K PointerType] struct {
@@ -75,22 +70,6 @@ func (m *PointerMap[K]) All() iter.Seq[K] {
 	}
 }
 
-// // OfType is an iterator over the elements of s with type t
-// func (m *PointerMap[K, T]) OfType(t T) iter.Seq[K] {
-// 	return func(yield func(K) bool) {
-// 		m.mtx.RLock()
-// 		defer m.mtx.RUnlock()
-
-// 		for k := range m.m {
-// 			if k.FilterType() == t {
-// 				if !yield(k) {
-// 					return
-// 				}
-// 			}
-// 		}
-// 	}
-// }
-
 func (m *PointerMap[K]) GetByID(id string) (k K) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
@@ -111,7 +90,6 @@ type MapType[K MapKey, V MapValue] map[K]V
 type MapValue interface {
 	comparable
 	GetID() string
-	// FilterType() T
 	Del(bool)
 }
 
@@ -130,13 +108,9 @@ func (t *Bool) GetID() string {
 	return ""
 }
 
-// func (t *Bool) FilterType() string {
-// 	return ""
-// }
-
 func (t *Bool) Del(bool) {}
 
-// NewCollection create new empty m: map[K]V
+// NewCollection creates new empty m: map[K]V
 func NewCollection[K MapKey, V MapValue]() *Collection[K, V] {
 	return &Collection[K, V]{
 		mtx: &sync.RWMutex{},
@@ -238,19 +212,3 @@ func (m *Collection[K, V]) All() iter.Seq2[K, V] {
 		}
 	}
 }
-
-// // All iterates over elements with type T
-// func (m *Collection[K, V, T]) OfType(t T) iter.Seq2[K, V] {
-// 	return func(yield func(K, V) bool) {
-// 		m.mtx.RLock()
-// 		defer m.mtx.RUnlock()
-
-// 		for k, v := range m.m {
-// 			if v.FilterType() == t {
-// 				if !yield(k, v) {
-// 					return
-// 				}
-// 			}
-// 		}
-// 	}
-// }
