@@ -32,6 +32,15 @@ func (t *ZTPeerID) IDX() string {
 }
 
 func (t *ZTPeerID) Del(bool) {}
+func (t *Device) GetID() string {
+	return t.ID
+}
+
+func (t *Device) IDX() string {
+	return t.ID
+}
+
+func (t *Device) Del(bool) {}
 
 func (t *TestBool) IDX()     {}
 func (t *TestBool) Del(bool) {}
@@ -43,6 +52,7 @@ var (
 	p  = NewPointerMap[*TestType]()
 	pc = NewCollection[*TestType, *TestBool]()
 	c  = NewCollection[string, *TestType]()
+	d  = NewCollection[string, *Device]()
 )
 
 func BenchmarkPointerMapAdd(b *testing.B) {
@@ -70,26 +80,26 @@ var s = &struct {
 }{}
 var t = &s.TestType
 
-// func BenchmarkCollectionAdd(b *testing.B) {
-// d:= NewDevice()
+func BenchmarkCollectionAdd(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		t.Field = fmt.Sprintf("test-%d", i)
+		t.Array = []int{i, 2, 3}
+		c.Add(t.Field, t)
+	}
+}
 
-// //		t.Field = &s._field
-// //		t.Array = &s._array
-//
-//	for i := 0; i < b.N; i++ {
-//		*d.DisplayName = fmt.Sprintf("test-%d", i)
-//
-// //			*t.Field = fmt.Sprintf("test-%d", i)
-// //			*t.Array = []int{i, 2, 3}
-// //			c.Add(*t.Field, t)
-//
-//		}
-//	}
+func BenchmarkCollectionExists(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		c.Exists(fmt.Sprintf("test-%d", i))
+	}
+}
+
 func BenchmarkCollectionGet(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		c.Get(fmt.Sprintf("test-%d", i))
 	}
 }
+
 func BenchmarkCollectionGetP(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var d *TestType
@@ -98,6 +108,7 @@ func BenchmarkCollectionGetP(b *testing.B) {
 		//fmt.Println("d: ", d)
 	}
 }
+
 func BenchmarkCollectionGetAll(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, _ = range c.All() {
@@ -105,11 +116,19 @@ func BenchmarkCollectionGetAll(b *testing.B) {
 		}
 	}
 }
+
 func BenchmarkGet(b *testing.B) {
-	// b.Run("add", BenchmarkCollectionAdd)
+	b.Run("add", BenchmarkCollectionAdd)
 	b.Run("get", BenchmarkCollectionGet)
-	b.Run("getp", BenchmarkCollectionGetP)
-	b.Run("getall", BenchmarkCollectionGetAll)
+	// b.Run("getp", BenchmarkCollectionGetP)
+	// b.Run("getall", BenchmarkCollectionGetAll)
+}
+
+func BenchmarkExists(b *testing.B) {
+	b.Run("add", BenchmarkCollectionAdd)
+	b.Run("exist", BenchmarkCollectionExists)
+	// b.Run("getp", BenchmarkCollectionGetP)
+	// b.Run("getall", BenchmarkCollectionGetAll)
 }
 
 // func TestPutGet(b *testing.T) {
@@ -144,40 +163,42 @@ func BenchmarkGet(b *testing.B) {
 //     }
 // }
 
-func TestCollectionPut(t *testing.T) {
-
+func BenchmarkCollectionPut(b *testing.B) {
+	for i := 0; i < 1000000; i++ {
+		d.Add(fmt.Sprintf("id-%d", i), NewDevice())
+	}
 }
 func TestCollectionGetP(t *testing.T) {
 
 }
 
 func NewDevice() (dc *Device) {
-	devContainer := &struct {
+	devContainer := struct {
 		Device
-		_ID                       *string
-		_IntuneUUID               *string
-		_DisplayName              *string
-		_Hostname                 *string
-		_Serial                   *string
-		_Added                    *time.Time
-		_LastSyncDateTime         *time.Time
-		_TotalStorageSpaceInBytes *int
-		_FreeStorageSpaceInBytes  *int
-		_WiFiMacAddress           *string
-		_MachineModel             *string
+		_ID                       string
+		_IntuneUUID               string
+		_DisplayName              string
+		_Hostname                 string
+		_Serial                   string
+		_Added                    time.Time
+		_LastSyncDateTime         time.Time
+		_TotalStorageSpaceInBytes int
+		_FreeStorageSpaceInBytes  int
+		_WiFiMacAddress           string
+		_MachineModel             string
 	}{}
 	dc = &devContainer.Device
-	dc.ID = *devContainer._ID
-	dc.IntuneUUID = *devContainer._IntuneUUID
-	dc.DisplayName = *devContainer._DisplayName
-	dc.Hostname = *devContainer._Hostname
-	dc.Serial = *devContainer._Serial
-	dc.Added = *devContainer._Added
-	dc.LastSyncDateTime = *devContainer._LastSyncDateTime
-	dc.TotalStorageSpaceInBytes = *devContainer._TotalStorageSpaceInBytes
-	dc.FreeStorageSpaceInBytes = *devContainer._FreeStorageSpaceInBytes
-	dc.WiFiMacAddress = *devContainer._WiFiMacAddress
-	dc.MachineModel = *devContainer._MachineModel
+	(*dc).ID = devContainer._ID
+	(*dc).IntuneUUID = devContainer._IntuneUUID
+	(*dc).DisplayName = devContainer._DisplayName
+	(*dc).Hostname = devContainer._Hostname
+	(*dc).Serial = devContainer._Serial
+	(*dc).Added = devContainer._Added
+	(*dc).LastSyncDateTime = devContainer._LastSyncDateTime
+	(*dc).TotalStorageSpaceInBytes = devContainer._TotalStorageSpaceInBytes
+	(*dc).FreeStorageSpaceInBytes = devContainer._FreeStorageSpaceInBytes
+	(*dc).WiFiMacAddress = devContainer._WiFiMacAddress
+	(*dc).MachineModel = devContainer._MachineModel
 
 	return
 }
