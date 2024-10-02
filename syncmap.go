@@ -23,7 +23,7 @@ type PointerMap[K PointerType] struct {
 func NewPointerMap[K PointerType]() *PointerMap[K] {
 	return &PointerMap[K]{
 		mtx: &sync.RWMutex{},
-		m:   make(map[K]struct{}, 64),
+		m:   make(map[K]struct{}),
 	}
 }
 
@@ -114,7 +114,7 @@ func (t *Bool) Del(bool) {}
 func NewCollection[K MapKey, V MapValue]() *Collection[K, V] {
 	return &Collection[K, V]{
 		mtx: &sync.RWMutex{},
-		m:   make(MapType[K, V], 64),
+		m:   make(MapType[K, V]),
 	}
 }
 
@@ -141,7 +141,6 @@ func (m *Collection[K, V]) GetP(key K, v *V) (ok bool) {
 	defer m.mtx.RUnlock()
 
 	*v, ok = m.m[key]
-
 	return
 }
 
@@ -171,7 +170,6 @@ func (m *Collection[K, V]) Add(k K, v V) {
 func (m *Collection[K, _]) Remove(key K) {
 	m.mtx.Lock()
 	delete(m.m, key)
-
 	m.mtx.Unlock()
 }
 
@@ -179,7 +177,6 @@ func (m *Collection[K, _]) Remove(key K) {
 func (m *Collection[K, _]) Delete(key K) {
 	m.mtx.Lock()
 	m.m[key].Del(true)
-
 	m.mtx.Unlock()
 }
 
