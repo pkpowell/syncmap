@@ -29,31 +29,30 @@ func NewPointerMap[K PointerType]() *PointerMap[K] {
 
 func (m *PointerMap[K]) Exists(key K) bool {
 	m.mtx.RLock()
-	defer m.mtx.RUnlock()
-
 	_, ok := m.m[key]
+	m.mtx.RUnlock()
+
 	return ok
 }
 
 func (m *PointerMap[K]) Add(key K) {
 	m.mtx.Lock()
-	defer m.mtx.Unlock()
-
 	m.m[key] = struct{}{}
+	m.mtx.Unlock()
 }
 
 func (m *PointerMap[K]) Remove(key K) {
 	m.mtx.Lock()
-	defer m.mtx.Unlock()
-
 	delete(m.m, key)
+	m.mtx.Unlock()
 }
 
-func (m *PointerMap[_]) Length() int {
+func (m *PointerMap[_]) Length() (l int) {
 	m.mtx.RLock()
-	defer m.mtx.RUnlock()
+	l = len(m.m)
+	m.mtx.RUnlock()
 
-	return len(m.m)
+	return
 }
 
 // All iterates over the elements of K
@@ -119,12 +118,12 @@ func NewCollection[K MapKey, V MapValue]() *Collection[K, V] {
 }
 
 // Exists check if key exists
-func (m *Collection[K, _]) Exists(key K) bool {
+func (m *Collection[K, _]) Exists(key K) (ok bool) {
 	m.mtx.RLock()
-	defer m.mtx.RUnlock()
+	_, ok = m.m[key]
+	m.mtx.RUnlock()
 
-	_, ok := m.m[key]
-	return ok
+	return
 }
 
 // Get val with key
@@ -138,9 +137,8 @@ func (m *Collection[K, V]) Get(key K) V {
 // Get val with key
 func (m *Collection[K, V]) GetP(key K, v *V) (ok bool) {
 	m.mtx.RLock()
-	defer m.mtx.RUnlock()
-
 	*v, ok = m.m[key]
+	m.mtx.RUnlock()
 	return
 }
 
@@ -189,11 +187,12 @@ func (m *Collection[K, _]) UnDelete(key K) {
 }
 
 // Length of map
-func (m *Collection[K, _]) Length() int {
+func (m *Collection[K, _]) Length() (l int) {
 	m.mtx.RLock()
-	defer m.mtx.RUnlock()
+	l = len(m.m)
+	m.mtx.RUnlock()
 
-	return len(m.m)
+	return
 }
 
 // All iterates over all elements of K
