@@ -56,7 +56,7 @@ var (
 )
 
 func BenchmarkPointerMapAdd(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for i := range b.N {
 		p.Add(&TestType{
 			Field: fmt.Sprintf("test-%d", i),
 			Array: []int{i, 2, 3},
@@ -65,7 +65,7 @@ func BenchmarkPointerMapAdd(b *testing.B) {
 }
 
 func BenchmarkCollBoolAdd(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for i := range b.N {
 		pc.Add(&TestType{
 			Field: fmt.Sprintf("test-%d", i),
 			Array: []int{i, 2, 3},
@@ -81,7 +81,7 @@ var s = &struct {
 var t = &s.TestType
 
 func BenchmarkCollectionAdd(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for i := range b.N {
 		t.Field = fmt.Sprintf("test-%d", i)
 		t.Array = []int{i, 2, 3}
 		c.Add(t.Field, t)
@@ -89,19 +89,19 @@ func BenchmarkCollectionAdd(b *testing.B) {
 }
 
 func BenchmarkCollectionExists(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for i := range b.N {
 		c.Exists(fmt.Sprintf("test-%d", i))
 	}
 }
 
 func BenchmarkCollectionGet(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for i := range b.N {
 		c.Get(fmt.Sprintf("test-%d", i))
 	}
 }
 
 func BenchmarkCollectionGetP(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for i := range b.N {
 		var d *TestType
 		c.GetP(fmt.Sprintf("test-%d", i), &d)
 
@@ -110,7 +110,7 @@ func BenchmarkCollectionGetP(b *testing.B) {
 }
 
 func BenchmarkCollectionGetAll(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		for _, _ = range c.All() {
 
 		}
@@ -164,7 +164,7 @@ func BenchmarkExists(b *testing.B) {
 // }
 
 func BenchmarkCollectionPut(b *testing.B) {
-	for i := 0; i < 1000000; i++ {
+	for i := range b.N {
 		d.Add(fmt.Sprintf("id-%d", i), NewDevice())
 	}
 }
