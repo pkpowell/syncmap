@@ -114,6 +114,9 @@ func (t *Bool) GetID() string {
 func (t *Bool) Del(bool) {}
 
 // NewCollection creates new empty m: map[K]V
+// Mid-Stack Inlined ?
+// see https://dave.cheney.net/2020/05/02/mid-stack-inlining-in-go
+
 func NewCollection[K MapKey, V MapValue]() *Collection[K, V] {
 	var c Collection[K, V]
 	return newCollection(&c)
