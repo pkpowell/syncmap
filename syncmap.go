@@ -21,10 +21,14 @@ type PointerMap[K PointerType] struct {
 
 // NewPointerMap init pointer map with type field T
 func NewPointerMap[K PointerType]() *PointerMap[K] {
-	return &PointerMap[K]{
-		mtx: &sync.RWMutex{},
-		m:   make(map[K]struct{}),
-	}
+	var p PointerMap[K]
+	return newPointerMap(&p)
+}
+
+func newPointerMap[K PointerType](p *PointerMap[K]) *PointerMap[K] {
+	p.mtx = &sync.RWMutex{}
+	p.m = make(map[K]struct{})
+	return p
 }
 
 func (m *PointerMap[K]) Exists(key K) bool {
@@ -111,10 +115,14 @@ func (t *Bool) Del(bool) {}
 
 // NewCollection creates new empty m: map[K]V
 func NewCollection[K MapKey, V MapValue]() *Collection[K, V] {
-	return &Collection[K, V]{
-		mtx: &sync.RWMutex{},
-		m:   make(MapType[K, V]),
-	}
+	var c Collection[K, V]
+	return newCollection(&c)
+}
+
+func newCollection[K MapKey, V MapValue](c *Collection[K, V]) *Collection[K, V] {
+	c.mtx = &sync.RWMutex{}
+	c.m = make(MapType[K, V])
+	return c
 }
 
 // Exists check if key exists
