@@ -169,7 +169,14 @@ func BenchmarkCollectionPut(b *testing.B) {
 	}
 }
 func TestCollectionGetP(t *testing.T) {
-
+	d := NewDevice()
+	for i := range 100 {
+		d.ZTPeers.Add(fmt.Sprintf("ID-%d", i), &ZTPeerID{Address: fmt.Sprintf("ID-%d", i)})
+	}
+	for i := range 100 {
+		var n *ZTPeerID
+		d.ZTPeers.GetP(fmt.Sprintf("ID-%d", i), &n)
+	}
 }
 
 func NewDevice() (dc *Device) {
@@ -186,6 +193,7 @@ func NewDevice() (dc *Device) {
 		_FreeStorageSpaceInBytes  int
 		_WiFiMacAddress           string
 		_MachineModel             string
+		_ZTPeers                  *Collection[string, *ZTPeerID]
 	}{}
 	dc = &devContainer.Device
 	(*dc).ID = devContainer._ID
@@ -199,6 +207,7 @@ func NewDevice() (dc *Device) {
 	(*dc).FreeStorageSpaceInBytes = devContainer._FreeStorageSpaceInBytes
 	(*dc).WiFiMacAddress = devContainer._WiFiMacAddress
 	(*dc).MachineModel = devContainer._MachineModel
+	(*dc).ZTPeers = NewCollection[string, *ZTPeerID]()
 
 	return
 }
