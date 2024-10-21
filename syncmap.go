@@ -105,13 +105,13 @@ type Collection[K MapKey, V MapValue] struct {
 	m   MapType[K, V]
 }
 
-type Bool struct{}
+// type Bool struct{}
 
-func (t *Bool) GetID() string {
-	return ""
-}
+// func (t *Bool) GetID() string {
+// 	return ""
+// }
 
-func (t *Bool) Del(bool) {}
+// func (t *Bool) Del(bool) {}
 
 // NewCollection creates new empty m: map[K]V
 // Mid-Stack Inlined ?
