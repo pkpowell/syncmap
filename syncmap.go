@@ -160,7 +160,7 @@ func (m *Collection[K, V]) GetP(key K, v *V) (ok bool) {
 }
 
 // Get whole map
-func (m *Collection[K, V]) GetAll() map[K]V {
+func (m *Collection[K, V]) GetAll() MapType[K, V] {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
