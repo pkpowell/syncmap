@@ -22,7 +22,9 @@ func (t *TestType) IDX() string {
 	return t.Field
 }
 
-func (t *TestType) Del(bool) {}
+func (t *TestType) Del(bool)              {}
+func (t *TestType) GetMTX() *sync.RWMutex { return nil }
+func (t *Device) GetMTX() *sync.RWMutex   { return t.mtx }
 func (t *ZTPeerID) GetID() string {
 	return t.Address
 }
@@ -31,7 +33,8 @@ func (t *ZTPeerID) IDX() string {
 	return t.Address
 }
 
-func (t *ZTPeerID) Del(bool) {}
+func (t *ZTPeerID) Del(bool)              {}
+func (t *ZTPeerID) GetMTX() *sync.RWMutex { return t.mtx }
 func (t *Device) GetID() string {
 	return t.ID
 }
@@ -42,8 +45,9 @@ func (t *Device) IDX() string {
 
 func (t *Device) Del(bool) {}
 
-func (t *TestBool) IDX()     {}
-func (t *TestBool) Del(bool) {}
+func (t *TestBool) IDX()                  {}
+func (t *TestBool) Del(bool)              {}
+func (t *TestBool) GetMTX() *sync.RWMutex { return nil }
 func (t *TestBool) GetID() string {
 	return ""
 }
@@ -269,10 +273,12 @@ type ZTPeerID struct {
 	Hostname string `cbor:"Hostname" json:"hostname"`
 	Address  string `cbor:"Address" json:"address"`
 	ID       string `cbor:"ID" json:"id"`
+
+	mtx *sync.RWMutex `cbor:"-" json:"-"`
 	// TimeStamp int64 `cbor:"TimeStamp" json:"timeStamp"`
 }
 type Device struct {
-	mtx                      *sync.Mutex                    `cbor:"-" json:"-"`
+	mtx                      *sync.RWMutex                  `cbor:"-" json:"-"`
 	ID                       string                         `cbor:"ID" json:"id"`
 	Hostname                 string                         `cbor:"HostName" json:"hostname"`
 	DisplayName              string                         `cbor:"DisplayName" json:"displayName,omitempty"`

@@ -59,6 +59,11 @@ func (m *PointerMap[_]) Length() (l int) {
 	return
 }
 
+// return mutex
+func (m *PointerMap[_]) GetMTX() *sync.RWMutex {
+	return m.mtx
+}
+
 // All iterates over the elements of K
 func (m *PointerMap[K]) All() iter.Seq[K] {
 	return func(yield func(K) bool) {
@@ -94,6 +99,7 @@ type MapValue interface {
 	comparable
 	GetID() string
 	Del(bool)
+	GetMTX() *sync.RWMutex
 }
 
 type MapKey interface {
@@ -204,6 +210,11 @@ func (m *Collection[K, _]) Length() (l int) {
 	m.mtx.RUnlock()
 
 	return
+}
+
+// return mutex
+func (m *Collection[K, _]) GetMTX() *sync.RWMutex {
+	return m.mtx
 }
 
 // All iterates over all elements of K
