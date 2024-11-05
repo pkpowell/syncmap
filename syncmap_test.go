@@ -22,9 +22,10 @@ func (t *TestType) IDX() string {
 	return t.Field
 }
 
-func (t *TestType) Del(bool)              {}
-func (t *TestType) GetMTX() *sync.RWMutex { return nil }
-func (t *Device) GetMTX() *sync.RWMutex   { return t.mtx }
+func (t *TestType) Del(bool) {}
+
+// func (t *TestType) GetMTX() *sync.RWMutex { return nil }
+// func (t *Device) GetMTX() *sync.RWMutex   { return t.mtx }
 func (t *ZTPeerID) GetID() string {
 	return t.Address
 }
@@ -33,8 +34,9 @@ func (t *ZTPeerID) IDX() string {
 	return t.Address
 }
 
-func (t *ZTPeerID) Del(bool)              {}
-func (t *ZTPeerID) GetMTX() *sync.RWMutex { return t.mtx }
+func (t *ZTPeerID) Del(bool) {}
+
+// func (t *ZTPeerID) GetMTX() *sync.RWMutex { return t.mtx }
 func (t *Device) GetID() string {
 	return t.ID
 }
@@ -45,9 +47,10 @@ func (t *Device) IDX() string {
 
 func (t *Device) Del(bool) {}
 
-func (t *TestBool) IDX()                  {}
-func (t *TestBool) Del(bool)              {}
-func (t *TestBool) GetMTX() *sync.RWMutex { return nil }
+func (t *TestBool) IDX()     {}
+func (t *TestBool) Del(bool) {}
+
+// func (t *TestBool) GetMTX() *sync.RWMutex { return nil }
 func (t *TestBool) GetID() string {
 	return ""
 }
