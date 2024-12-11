@@ -52,20 +52,18 @@ func (m *PointerMap[K]) Remove(key K) {
 	m.mtx.Unlock()
 }
 
-func (m *PointerMap[_]) Length() (l int) {
+func (m *PointerMap[_]) Length() int {
 	m.mtx.RLock()
-	l = len(m.m)
-	m.mtx.RUnlock()
+	defer m.mtx.RUnlock()
 
-	return
+	return len(m.m)
 }
 
 func (m *PointerMap[_]) LenStr() string {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
-	l := len(m.m)
 
-	return strconv.Itoa(l)
+	return strconv.Itoa(len(m.m))
 }
 
 // // return mutex
@@ -213,12 +211,18 @@ func (m *Collection[K, _]) UnDelete(key K) {
 }
 
 // Length of map
-func (m *Collection[K, _]) Length() (l int) {
+func (m *Collection[_, _]) Length() int {
 	m.mtx.RLock()
-	l = len(m.m)
-	m.mtx.RUnlock()
+	defer m.mtx.RUnlock()
 
-	return
+	return len(m.m)
+}
+
+func (m *Collection[_, _]) LenStr() string {
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
+
+	return strconv.Itoa(len(m.m))
 }
 
 // // return mutex
