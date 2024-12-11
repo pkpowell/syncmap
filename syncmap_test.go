@@ -2,7 +2,6 @@ package syncmap
 
 import (
 	"fmt"
-	"sync"
 	"testing"
 	"time"
 )
@@ -277,11 +276,11 @@ type ZTPeerID struct {
 	Address  string `cbor:"Address" json:"address"`
 	ID       string `cbor:"ID" json:"id"`
 
-	mtx *sync.RWMutex `cbor:"-" json:"-"`
+	// mtx *sync.RWMutex `cbor:"-" json:"-"`
 	// TimeStamp int64 `cbor:"TimeStamp" json:"timeStamp"`
 }
 type Device struct {
-	mtx                      *sync.RWMutex                  `cbor:"-" json:"-"`
+	// mtx                      *sync.RWMutex                  `cbor:"-" json:"-"`
 	ID                       string                         `cbor:"ID" json:"id"`
 	Hostname                 string                         `cbor:"HostName" json:"hostname"`
 	DisplayName              string                         `cbor:"DisplayName" json:"displayName,omitempty"`

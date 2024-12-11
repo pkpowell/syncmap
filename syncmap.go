@@ -2,6 +2,7 @@ package syncmap
 
 import (
 	"iter"
+	"strconv"
 	"sync"
 )
 
@@ -57,6 +58,14 @@ func (m *PointerMap[_]) Length() (l int) {
 	m.mtx.RUnlock()
 
 	return
+}
+
+func (m *PointerMap[_]) LenStr() string {
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
+	l := len(m.m)
+
+	return strconv.Itoa(l)
 }
 
 // // return mutex
