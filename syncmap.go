@@ -29,30 +29,34 @@ func NewPointerMap[K PointerType]() *PointerMap[K] {
 func newPointerMap[K PointerType](p *PointerMap[K]) *PointerMap[K] {
 	p.mtx = &sync.RWMutex{}
 	p.m = make(map[K]struct{})
+
 	return p
 }
 
-func (m *PointerMap[K]) Exists(key K) bool {
+func (m *PointerMap[K]) Exists(key K) (ok bool) {
 	m.mtx.RLock()
-	_, ok := m.m[key]
-	m.mtx.RUnlock()
+	defer m.mtx.RUnlock()
+
+	_, ok = m.m[key]
 
 	return ok
 }
 
 func (m *PointerMap[K]) Add(key K) {
 	m.mtx.Lock()
+	defer m.mtx.Unlock()
+
 	m.m[key] = struct{}{}
-	m.mtx.Unlock()
 }
 
 func (m *PointerMap[K]) Remove(key K) {
 	m.mtx.Lock()
+	defer m.mtx.Unlock()
+
 	delete(m.m, key)
-	m.mtx.Unlock()
 }
 
-func (m *PointerMap[_]) Length() int {
+func (m *PointerMap[_]) Len() int {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
@@ -65,11 +69,6 @@ func (m *PointerMap[_]) LenStr() string {
 
 	return strconv.Itoa(len(m.m))
 }
-
-// // return mutex
-// func (m *PointerMap[_]) GetMTX() *sync.RWMutex {
-// 	return m.mtx
-// }
 
 // All iterates over the elements of K
 func (m *PointerMap[K]) All() iter.Seq[K] {
@@ -106,7 +105,6 @@ type MapValue interface {
 	comparable
 	GetID() string
 	Del(bool)
-	// GetMTX() *sync.RWMutex
 }
 
 type MapKey interface {
@@ -117,14 +115,6 @@ type Collection[K MapKey, V MapValue] struct {
 	mtx *sync.RWMutex
 	m   MapType[K, V]
 }
-
-// type Bool struct{}
-
-// func (t *Bool) GetID() string {
-// 	return ""
-// }
-
-// func (t *Bool) Del(bool) {}
 
 // NewCollection creates new empty m: map[K]V
 // Mid-Stack Inlined ?
@@ -144,9 +134,9 @@ func newCollection[K MapKey, V MapValue](c *Collection[K, V]) *Collection[K, V] 
 // Exists check if key exists
 func (m *Collection[K, _]) Exists(key K) (ok bool) {
 	m.mtx.RLock()
-	_, ok = m.m[key]
-	m.mtx.RUnlock()
+	defer m.mtx.RUnlock()
 
+	_, ok = m.m[key]
 	return
 }
 
@@ -161,8 +151,9 @@ func (m *Collection[K, V]) Get(key K) V {
 // Get val with key
 func (m *Collection[K, V]) GetP(key K, v *V) (ok bool) {
 	m.mtx.RLock()
+	defer m.mtx.RUnlock()
+
 	*v, ok = m.m[key]
-	m.mtx.RUnlock()
 	return
 }
 
@@ -177,29 +168,33 @@ func (m *Collection[K, V]) GetAll() MapType[K, V] {
 // Set / Overwrite map from map
 func (m *Collection[K, V]) Set(v map[K]V) {
 	m.mtx.Lock()
+	defer m.mtx.Unlock()
+
 	m.m = v
-	m.mtx.Unlock()
 }
 
 // Add key / val to map
 func (m *Collection[K, V]) Add(k K, v V) {
 	m.mtx.Lock()
+	defer m.mtx.Unlock()
+
 	m.m[k] = v
-	m.mtx.Unlock()
 }
 
 // Remove key from map
 func (m *Collection[K, _]) Remove(key K) {
 	m.mtx.Lock()
+	defer m.mtx.Unlock()
+
 	delete(m.m, key)
-	m.mtx.Unlock()
 }
 
 // Mark key as deleted
 func (m *Collection[K, _]) Delete(key K) {
 	m.mtx.Lock()
+	defer m.mtx.Unlock()
+
 	m.m[key].Del(true)
-	m.mtx.Unlock()
 }
 
 // Mark key as not deleted
@@ -210,8 +205,8 @@ func (m *Collection[K, _]) UnDelete(key K) {
 	m.m[key].Del(false)
 }
 
-// Length of map
-func (m *Collection[_, _]) Length() int {
+// Len of map
+func (m *Collection[_, _]) Len() int {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
@@ -224,11 +219,6 @@ func (m *Collection[_, _]) LenStr() string {
 
 	return strconv.Itoa(len(m.m))
 }
-
-// // return mutex
-// func (m *Collection[K, _]) GetMTX() *sync.RWMutex {
-// 	return m.mtx
-// }
 
 // All iterates over all elements of K
 func (m *Collection[K, V]) All() iter.Seq2[K, V] {
