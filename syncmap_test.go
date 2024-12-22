@@ -117,7 +117,7 @@ func BenchmarkCollectionGetP(b *testing.B) {
 
 func BenchmarkCollectionGetAll(b *testing.B) {
 	for range b.N {
-		for _, _ = range c.All() {
+		for range c.All() {
 
 		}
 	}
