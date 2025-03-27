@@ -141,28 +141,31 @@ func (m *Collection[K, _]) Exists(key K) (ok bool) {
 }
 
 // Get val with key
-func (m *Collection[K, V]) Get(key K) V {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
+func (m *Collection[K, V]) Get(key K) (val V) {
+	// m.mtx.Lock()
+	// defer m.mtx.Unlock()
+	val = m.m[key]
 
-	return m.m[key]
+	return
 }
 
 // Get val with key
 func (m *Collection[K, V]) GetP(key K, v *V) (ok bool) {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
-
+	// m.mtx.Lock()
+	// defer m.mtx.Unlock()
 	*v, ok = m.m[key]
+
 	return
 }
 
 // Get whole map
-func (m *Collection[K, V]) GetAll() MapType[K, V] {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
+func (m *Collection[K, V]) GetAll() (val MapType[K, V]) {
+	m.mtx.Lock()
+	defer m.mtx.Unlock()
 
-	return m.m
+	val = m.m
+
+	return
 }
 
 // Set / Overwrite map from map
