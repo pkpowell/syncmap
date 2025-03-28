@@ -133,8 +133,8 @@ func newCollection[K MapKey, V MapValue](c *Collection[K, V]) *Collection[K, V] 
 
 // Exists check if key exists
 func (m *Collection[K, _]) Exists(key K) (ok bool) {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
+	// m.mtx.RLock()
+	// defer m.mtx.RUnlock()
 
 	_, ok = m.m[key]
 	return
