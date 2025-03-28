@@ -142,8 +142,8 @@ func (m *Collection[K, _]) Exists(key K) (ok bool) {
 
 // Get val with key
 func (m *Collection[K, V]) Get(key K) (val V) {
-	// m.mtx.Lock()
-	// defer m.mtx.Unlock()
+	m.mtx.Lock()
+	defer m.mtx.Unlock()
 	val = m.m[key]
 
 	return
