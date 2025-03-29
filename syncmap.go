@@ -1,6 +1,7 @@
 package syncmap
 
 import (
+	"fmt"
 	"iter"
 	"strconv"
 	"sync"
@@ -133,101 +134,129 @@ func newCollection[K MapKey, V MapValue](c *Collection[K, V]) *Collection[K, V] 
 
 // Exists check if key exists
 func (m *Collection[K, _]) Exists(key K) (ok bool) {
-	// m.mtx.RLock()
-	// defer m.mtx.RUnlock()
-
-	_, ok = m.m[key]
+	if m.mtx.TryRLock() {
+		defer m.mtx.RUnlock()
+		_, ok = m.m[key]
+	} else {
+		fmt.Println("TryRLock failed")
+	}
 	return
 }
 
 // Get val with key
 func (m *Collection[K, V]) Get(key K) (val V) {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
-	val = m.m[key]
-
+	if m.mtx.TryRLock() {
+		defer m.mtx.RUnlock()
+		val = m.m[key]
+	} else {
+		fmt.Println("TryRLock failed")
+	}
 	return
 }
 
 // Get val with key
 func (m *Collection[K, V]) GetP(key K, v *V) (ok bool) {
-	// m.mtx.Lock()
-	// defer m.mtx.Unlock()
-	*v, ok = m.m[key]
-
+	if m.mtx.TryRLock() {
+		defer m.mtx.RUnlock()
+		*v, ok = m.m[key]
+	} else {
+		fmt.Println("TryRLock failed")
+	}
 	return
 }
 
 // Get whole map
 func (m *Collection[K, V]) GetAll() (val MapType[K, V]) {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
-
-	val = m.m
-
+	if m.mtx.TryRLock() {
+		defer m.mtx.RUnlock()
+		val = m.m
+	} else {
+		fmt.Printf("TryRLock failed for %T\n", *new(V))
+	}
 	return
 }
 
 // Set / Overwrite map from map
 func (m *Collection[K, V]) Set(v map[K]V) {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
-
-	m.m = v
+	if m.mtx.TryLock() {
+		defer m.mtx.Unlock()
+		m.m = v
+	} else {
+		fmt.Printf("Set - TryLock failed for %T\n", *new(V))
+	}
 }
 
 // Add key / val to map
 func (m *Collection[K, V]) Add(k K, v V) {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
-
-	m.m[k] = v
+	if m.mtx.TryLock() {
+		defer m.mtx.Unlock()
+		m.m[k] = v
+	} else {
+		fmt.Printf("Add - TryLock failed for %T\n", *new(V))
+	}
 }
 
 // Remove key from map
 func (m *Collection[K, _]) Remove(key K) {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
+	if m.mtx.TryLock() {
+		defer m.mtx.Unlock()
+		delete(m.m, key)
+	} else {
+		fmt.Println("Remove - TryLock failed")
+	}
 
-	delete(m.m, key)
 }
 
 // Mark key as deleted
 func (m *Collection[K, _]) Delete(key K) {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
+	if m.mtx.TryLock() {
+		defer m.mtx.Unlock()
+		m.m[key].Del(true)
+	} else {
+		fmt.Println("Delete - TryLock failed")
+	}
 
-	m.m[key].Del(true)
 }
 
 // Mark key as not deleted
 func (m *Collection[K, _]) UnDelete(key K) {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
+	if m.mtx.TryLock() {
+		defer m.mtx.Unlock()
+		m.m[key].Del(false)
+	} else {
+		fmt.Println("UnDelete - TryLock failed")
+	}
 
-	m.m[key].Del(false)
 }
 
 // Len of map
 func (m *Collection[_, _]) Len() int {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
+	if m.mtx.TryRLock() {
+		defer m.mtx.RUnlock()
+		return len(m.m)
+	} else {
+		fmt.Println("Len - TryRLock failed")
+		return 0
+	}
 
-	return len(m.m)
 }
 
 func (m *Collection[_, _]) LenStr() string {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
+	if m.mtx.TryRLock() {
+		defer m.mtx.RUnlock()
+		return strconv.Itoa(len(m.m))
+	} else {
+		fmt.Println("LenStr - TryRLock failed")
+		return ""
+	}
 
-	return strconv.Itoa(len(m.m))
 }
 
 // All iterates over all elements of K
 func (m *Collection[K, V]) All() iter.Seq2[K, V] {
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
 	return func(yield func(K, V) bool) {
-		m.mtx.RLock()
-		defer m.mtx.RUnlock()
 
 		for k, v := range m.m {
 			if !yield(k, v) {
