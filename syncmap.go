@@ -138,7 +138,7 @@ func (m *Collection[K, _]) Exists(key K) (ok bool) {
 		defer m.mtx.RUnlock()
 		_, ok = m.m[key]
 	} else {
-		fmt.Println("TryRLock failed")
+		fmt.Println("Exists - TryRLock failed")
 	}
 	return
 }
@@ -149,7 +149,8 @@ func (m *Collection[K, V]) Get(key K) (val V) {
 		defer m.mtx.RUnlock()
 		val = m.m[key]
 	} else {
-		fmt.Println("TryRLock failed")
+		fmt.Println("Get - TryRLock failed")
+		m.mtx.Unlock()
 	}
 	return
 }
@@ -160,7 +161,8 @@ func (m *Collection[K, V]) GetP(key K, v *V) (ok bool) {
 		defer m.mtx.RUnlock()
 		*v, ok = m.m[key]
 	} else {
-		fmt.Println("TryRLock failed")
+		fmt.Println("GetP - TryRLock failed")
+		m.mtx.Unlock()
 	}
 	return
 }
@@ -171,7 +173,8 @@ func (m *Collection[K, V]) GetAll() (val MapType[K, V]) {
 		defer m.mtx.RUnlock()
 		val = m.m
 	} else {
-		fmt.Printf("TryRLock failed for %T\n", *new(V))
+		fmt.Printf("GetAll - TryRLock failed for %T\n", *new(V))
+		m.mtx.Unlock()
 	}
 	return
 }
@@ -183,6 +186,7 @@ func (m *Collection[K, V]) Set(v map[K]V) {
 		m.m = v
 	} else {
 		fmt.Printf("Set - TryLock failed for %T\n", *new(V))
+		m.mtx.Unlock()
 	}
 }
 
@@ -193,6 +197,7 @@ func (m *Collection[K, V]) Add(k K, v V) {
 		m.m[k] = v
 	} else {
 		fmt.Printf("Add - TryLock failed for %T\n", *new(V))
+		m.mtx.Unlock()
 	}
 }
 
@@ -203,6 +208,7 @@ func (m *Collection[K, _]) Remove(key K) {
 		delete(m.m, key)
 	} else {
 		fmt.Println("Remove - TryLock failed")
+		m.mtx.Unlock()
 	}
 
 }
@@ -214,6 +220,7 @@ func (m *Collection[K, _]) Delete(key K) {
 		m.m[key].Del(true)
 	} else {
 		fmt.Println("Delete - TryLock failed")
+		m.mtx.Unlock()
 	}
 
 }
@@ -225,6 +232,7 @@ func (m *Collection[K, _]) UnDelete(key K) {
 		m.m[key].Del(false)
 	} else {
 		fmt.Println("UnDelete - TryLock failed")
+		m.mtx.Unlock()
 	}
 
 }
@@ -236,6 +244,7 @@ func (m *Collection[_, _]) Len() int {
 		return len(m.m)
 	} else {
 		fmt.Println("Len - TryRLock failed")
+		m.mtx.Unlock()
 		return 0
 	}
 
@@ -247,6 +256,7 @@ func (m *Collection[_, _]) LenStr() string {
 		return strconv.Itoa(len(m.m))
 	} else {
 		fmt.Println("LenStr - TryRLock failed")
+		m.mtx.Unlock()
 		return ""
 	}
 
