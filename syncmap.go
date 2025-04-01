@@ -186,7 +186,7 @@ func (m *Collection[K, V]) Set(v map[K]V) {
 		m.m = v
 	} else {
 		fmt.Printf("Set - TryLock failed for %T\n", *new(V))
-		m.mtx.Unlock()
+		// m.mtx.Unlock()
 	}
 }
 
@@ -197,7 +197,7 @@ func (m *Collection[K, V]) Add(k K, v V) {
 		m.m[k] = v
 	} else {
 		fmt.Printf("Add - TryLock failed for %T\n", *new(V))
-		m.mtx.Unlock()
+		// m.mtx.Unlock()
 	}
 }
 
@@ -208,7 +208,7 @@ func (m *Collection[K, _]) Remove(key K) {
 		delete(m.m, key)
 	} else {
 		fmt.Println("Remove - TryLock failed")
-		m.mtx.Unlock()
+		// m.mtx.Unlock()
 	}
 
 }
@@ -220,7 +220,7 @@ func (m *Collection[K, _]) Delete(key K) {
 		m.m[key].Del(true)
 	} else {
 		fmt.Println("Delete - TryLock failed")
-		m.mtx.Unlock()
+		// m.mtx.Unlock()
 	}
 
 }
@@ -232,7 +232,7 @@ func (m *Collection[K, _]) UnDelete(key K) {
 		m.m[key].Del(false)
 	} else {
 		fmt.Println("UnDelete - TryLock failed")
-		m.mtx.Unlock()
+		// m.mtx.Unlock()
 	}
 
 }
@@ -244,7 +244,7 @@ func (m *Collection[_, _]) Len() int {
 		return len(m.m)
 	} else {
 		fmt.Println("Len - TryRLock failed")
-		m.mtx.Unlock()
+		// m.mtx.Unlock()
 		return 0
 	}
 
@@ -256,7 +256,7 @@ func (m *Collection[_, _]) LenStr() string {
 		return strconv.Itoa(len(m.m))
 	} else {
 		fmt.Println("LenStr - TryRLock failed")
-		m.mtx.Unlock()
+		// m.mtx.Unlock()
 		return ""
 	}
 
