@@ -137,7 +137,6 @@ func (m *Collection[K, _]) Exists(key K) (ok bool) {
 	defer m.mtx.RUnlock()
 
 	_, ok = m.m[key]
-
 	return
 }
 
@@ -147,7 +146,6 @@ func (m *Collection[K, V]) Get(key K) (val V) {
 	defer m.mtx.RUnlock()
 
 	val = m.m[key]
-
 	return
 }
 
@@ -157,7 +155,6 @@ func (m *Collection[K, V]) GetP(key K, v *V) (ok bool) {
 	defer m.mtx.RUnlock()
 
 	*v, ok = m.m[key]
-
 	return
 }
 
@@ -167,7 +164,6 @@ func (m *Collection[K, V]) GetAll() (val MapType[K, V]) {
 	defer m.mtx.RUnlock()
 
 	val = m.m
-
 	return
 }
 
@@ -232,7 +228,6 @@ func (m *Collection[K, V]) All() iter.Seq2[K, V] {
 	defer m.mtx.Unlock()
 
 	return func(yield func(K, V) bool) {
-
 		for k, v := range m.m {
 			if !yield(k, v) {
 				return
