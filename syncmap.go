@@ -224,10 +224,10 @@ func (m *Collection[_, _]) LenStr() string {
 
 // All iterates over all elements of K
 func (m *Collection[K, V]) All() iter.Seq2[K, V] {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
-
 	return func(yield func(K, V) bool) {
+		m.mtx.RLock()
+		defer m.mtx.RUnlock()
+
 		for k, v := range m.m {
 			if !yield(k, v) {
 				return
