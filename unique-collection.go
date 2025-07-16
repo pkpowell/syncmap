@@ -56,7 +56,7 @@ func (m *UniqueCollection[K, V]) Get(key K) (val V) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
-	val = m.m[key]
+	val = m.m[key].Value()
 	return
 }
 
@@ -89,11 +89,11 @@ func (m *UniqueCollection[K, V]) GetAll() (val MapType[K, V]) {
 // }
 
 // Add key / val to map
-func (m *UniqueCollection[K, V]) Add(k K, d V) {
+func (m *UniqueCollection[K, V]) Add(k K, v V) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
-	m.m[k] = unique.Handle[V](d)
+	m.m[k] = unique.Handle[V](v)
 }
 
 // Remove key from map
