@@ -12,16 +12,6 @@ import (
 // ///////////////////////////
 type UniqueMapType[K MapKey, V MapValue] map[K]unique.Handle[V]
 
-// type UniqueMapValue interface {
-// 	comparable
-// 	GetID() string
-// 	Del(bool)
-// }
-
-// type UniqueMapKey interface {
-// 	comparable
-// }
-
 type UniqueCollection[K MapKey, V MapValue] struct {
 	mtx *sync.RWMutex
 	m   UniqueMapType[K, V]
@@ -64,6 +54,7 @@ func (m *UniqueCollection[K, V]) Get(key K) (val V) {
 func (m *UniqueCollection[K, V]) GetAll() (val MapType[K, V]) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
+
 	for i, u := range m.m {
 		val[i] = u.Value()
 	}
