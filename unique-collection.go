@@ -17,10 +17,9 @@ type UniqueCollection[K MapKey, V MapValue] struct {
 	m   UniqueMapType[K, V]
 }
 
-// NewCollection creates new empty m: map[K]V
+// NewUniqueCollection creates new empty m: map[K]V
 // Mid-Stack Inlined ?
 // see https://dave.cheney.net/2020/05/02/mid-stack-inlining-in-go
-
 func NewUniqueCollection[K MapKey, V MapValue]() *UniqueCollection[K, V] {
 	var c UniqueCollection[K, V]
 	return newUniqueCollection(&c)

@@ -59,6 +59,8 @@ var (
 	pc = NewCollection[*TestType, *TestBool]()
 	c  = NewCollection[string, *TestType]()
 	d  = NewCollection[string, *Device]()
+
+	u = NewUniqueCollection[string, *TestType]()
 )
 
 func BenchmarkPointerMapAdd(b *testing.B) {
@@ -91,6 +93,17 @@ func BenchmarkCollectionAdd(b *testing.B) {
 		t.Field = fmt.Sprintf("test-%d", i)
 		t.Array = []int{i, 2, 3}
 		c.Add(t.Field, t)
+	}
+}
+func BenchmarkUniqueCollectionAdd(b *testing.B) {
+	var updated bool
+	for i := range b.N {
+		t.Field = fmt.Sprintf("test-%d", i)
+		t.Array = []int{i, 2, 3}
+		updated = u.Add(t.Field, t)
+		if updated {
+			b.Logf("%s updated!", t.Field)
+		}
 	}
 }
 
