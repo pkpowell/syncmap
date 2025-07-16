@@ -10,19 +10,19 @@ import (
 // ///////////////////////////
 // Unique Collection
 // ///////////////////////////
-type UniqueMapType[K UniqueMapKey, V UniqueMapValue] map[K]unique.Handle[V]
+type UniqueMapType[K MapKey, V MapValue] map[K]unique.Handle[V]
 
-type UniqueMapValue interface {
-	comparable
-	GetID() string
-	Del(bool)
-}
+// type UniqueMapValue interface {
+// 	comparable
+// 	GetID() string
+// 	Del(bool)
+// }
 
-type UniqueMapKey interface {
-	comparable
-}
+// type UniqueMapKey interface {
+// 	comparable
+// }
 
-type UniqueCollection[K UniqueMapKey, V UniqueMapValue] struct {
+type UniqueCollection[K MapKey, V MapValue] struct {
 	mtx *sync.RWMutex
 	m   UniqueMapType[K, V]
 }
@@ -31,12 +31,12 @@ type UniqueCollection[K UniqueMapKey, V UniqueMapValue] struct {
 // Mid-Stack Inlined ?
 // see https://dave.cheney.net/2020/05/02/mid-stack-inlining-in-go
 
-func NewUniqueCollection[K UniqueMapKey, V UniqueMapValue]() *UniqueCollection[K, V] {
+func NewUniqueCollection[K MapKey, V MapValue]() *UniqueCollection[K, V] {
 	var c UniqueCollection[K, V]
 	return newUniqueCollection(&c)
 }
 
-func newUniqueCollection[K UniqueMapKey, V UniqueMapValue](c *UniqueCollection[K, V]) *UniqueCollection[K, V] {
+func newUniqueCollection[K MapKey, V MapValue](c *UniqueCollection[K, V]) *UniqueCollection[K, V] {
 	c.mtx = &sync.RWMutex{}
 	c.m = make(UniqueMapType[K, V])
 	return c
@@ -60,15 +60,6 @@ func (m *UniqueCollection[K, V]) Get(key K) (val V) {
 	return
 }
 
-// // Get val pointer with key
-// func (m *UniqueCollection[K, V]) GetP(key K, v unique.Handle[V]) (ok bool) {
-// 	m.mtx.RLock()
-// 	defer m.mtx.RUnlock()
-
-// 	v, ok = m.m[key]
-// 	return
-// }
-
 // Get whole map
 func (m *UniqueCollection[K, V]) GetAll() (val MapType[K, V]) {
 	m.mtx.RLock()
@@ -80,20 +71,36 @@ func (m *UniqueCollection[K, V]) GetAll() (val MapType[K, V]) {
 	return
 }
 
-// // Set / Overwrite map from map
-// func (m *UniqueCollection[K, V]) Set(v map[K]unique.Handle[V]) {
-// 	m.mtx.Lock()
-// 	defer m.mtx.Unlock()
+// Overwrite map from map
+func (m *UniqueCollection[K, V]) Overwrite(d map[K]V) {
+	m.mtx.Lock()
+	defer m.mtx.Unlock()
+	clear(m.m)
 
-// 	m.m = v
-// }
+	for k, v := range d {
+		m.m[k] = unique.Make(v)
+	}
+}
 
-// Add key / val to map
-func (m *UniqueCollection[K, V]) Add(k K, v V) {
+// merge data from map
+func (m *UniqueCollection[K, V]) Merge(d map[K]V) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
-	m.m[k] = unique.Handle[V](v)
+	for k, v := range d {
+		m.m[k] = unique.Make(v)
+	}
+}
+
+// Add key / val to map
+func (m *UniqueCollection[K, V]) Add(k K, v V) (updated bool) {
+	m.mtx.Lock()
+	defer m.mtx.Unlock()
+	new := unique.Make(v)
+	updated = (new == m.m[k])
+
+	m.m[k] = new
+	return
 }
 
 // Remove key from map
@@ -104,21 +111,21 @@ func (m *UniqueCollection[K, _]) Remove(key K) {
 	delete(m.m, key)
 }
 
-// Mark key as deleted
-func (m *UniqueCollection[K, _]) Delete(key K) {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
+// // Mark key as deleted
+// func (m *UniqueCollection[K, _]) Delete(key K) {
+// 	m.mtx.Lock()
+// 	defer m.mtx.Unlock()
 
-	m.m[key].Del(true)
-}
+// 	m.m[key].Del(true)
+// }
 
-// Mark key as not deleted
-func (m *UniqueCollection[K, _]) UnDelete(key K) {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
+// // Mark key as not deleted
+// func (m *UniqueCollection[K, _]) UnDelete(key K) {
+// 	m.mtx.Lock()
+// 	defer m.mtx.Unlock()
 
-	m.m[key].Del(false)
-}
+// 	m.m[key].Del(false)
+// }
 
 // Len of map
 func (m *UniqueCollection[_, _]) Len() int {
