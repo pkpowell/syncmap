@@ -10,7 +10,7 @@ import (
 // ///////////////////////////
 // Unique Collection
 // ///////////////////////////
-type UniqueMapType[K UniqueMapKey, V unique.Handle[V]] map[K]V
+type UniqueMapType[K UniqueMapKey, V UniqueMapValue] map[K]unique.Handle[V]
 
 type UniqueMapValue interface {
 	comparable
@@ -22,7 +22,7 @@ type UniqueMapKey interface {
 	comparable
 }
 
-type UniqueCollection[K UniqueMapKey, V unique.Handle[V]] struct {
+type UniqueCollection[K UniqueMapKey, V UniqueMapValue] struct {
 	mtx *sync.RWMutex
 	m   UniqueMapType[K, V]
 }
@@ -31,12 +31,12 @@ type UniqueCollection[K UniqueMapKey, V unique.Handle[V]] struct {
 // Mid-Stack Inlined ?
 // see https://dave.cheney.net/2020/05/02/mid-stack-inlining-in-go
 
-func NewUniqueCollection[K UniqueMapKey, V unique.Handle[V]]() *UniqueCollection[K, V] {
+func NewUniqueCollection[K UniqueMapKey, V UniqueMapValue]() *UniqueCollection[K, V] {
 	var c UniqueCollection[K, V]
 	return newUniqueCollection(&c)
 }
 
-func newUniqueCollection[K UniqueMapKey, V unique.Handle[V]](c *UniqueCollection[K, V]) *UniqueCollection[K, V] {
+func newUniqueCollection[K UniqueMapKey, V UniqueMapValue](c *UniqueCollection[K, V]) *UniqueCollection[K, V] {
 	c.mtx = &sync.RWMutex{}
 	c.m = make(UniqueMapType[K, V])
 	return c
@@ -60,7 +60,7 @@ func (m *UniqueCollection[K, V]) Get(key K) (val V) {
 	return
 }
 
-// // Get val with key
+// // Get val pointer with key
 // func (m *UniqueCollection[K, V]) GetP(key K, v unique.Handle[V]) (ok bool) {
 // 	m.mtx.RLock()
 // 	defer m.mtx.RUnlock()
@@ -70,11 +70,13 @@ func (m *UniqueCollection[K, V]) Get(key K) (val V) {
 // }
 
 // Get whole map
-func (m *UniqueCollection[K, V]) GetAll() (val *UniqueMapType[K, V]) {
+func (m *UniqueCollection[K, V]) GetAll() (val MapType[K, V]) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
+	for i, u := range m.m {
+		val[i] = u.Value()
+	}
 
-	val = &m.m
 	return
 }
 
@@ -87,7 +89,7 @@ func (m *UniqueCollection[K, V]) GetAll() (val *UniqueMapType[K, V]) {
 // }
 
 // Add key / val to map
-func (m *UniqueCollection[K, V]) Add(k K, d D) {
+func (m *UniqueCollection[K, V]) Add(k K, d V) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
