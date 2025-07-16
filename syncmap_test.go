@@ -96,6 +96,12 @@ func BenchmarkCollectionAdd(b *testing.B) {
 	}
 }
 func BenchmarkUniqueCollectionAdd(b *testing.B) {
+	for i := range b.N {
+		t.Field = fmt.Sprintf("test-%d", i)
+		t.Array = []int{i, 2, 3}
+		u.Add(t.Field, t)
+	}
+
 	var updated bool
 	for i := range b.N {
 		t.Field = fmt.Sprintf("test-%d", i)
@@ -104,6 +110,16 @@ func BenchmarkUniqueCollectionAdd(b *testing.B) {
 		if updated {
 			b.Logf("%s updated!", t.Field)
 		}
+	}
+	t.Field = fmt.Sprintf("test-%d", 500)
+	t.Array = []int{500, 2, 3}
+	if u.Add(t.Field, t) {
+		b.Logf("%s updated!", t.Field)
+	}
+	t.Field = fmt.Sprintf("test-%d", 500)
+	t.Array = []int{500, 50, 3}
+	if u.Add(t.Field, t) {
+		b.Logf("%s updated!", t.Field)
 	}
 }
 

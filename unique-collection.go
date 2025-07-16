@@ -82,12 +82,13 @@ func (m *UniqueCollection[K, V]) Merge(d map[K]V) {
 	}
 }
 
-// Add key / val to map
+// Add key / val to map, return true if value changed
 func (m *UniqueCollection[K, V]) Add(k K, v V) (updated bool) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
+
 	new := unique.Make(v)
-	updated = (new == m.m[k])
+	updated = new != m.m[k]
 
 	m.m[k] = new
 	return
