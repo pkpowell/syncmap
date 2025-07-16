@@ -50,15 +50,17 @@ func (m *UniqueCollection[K, V]) Get(key K) (val V) {
 }
 
 // Get whole map
-func (m *UniqueCollection[K, V]) GetAll() (val MapType[K, V]) {
+func (m *UniqueCollection[K, V]) GetAll() *MapType[K, V] {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
+
+	val := make(MapType[K, V])
 
 	for i, u := range m.m {
 		val[i] = u.Value()
 	}
 
-	return
+	return &val
 }
 
 // Overwrite map from map
