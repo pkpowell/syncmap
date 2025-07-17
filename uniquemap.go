@@ -64,7 +64,7 @@ func (m *UniqueCollection[K, V]) GetAll() *MapType[K, V] {
 }
 
 // Overwrite map from map
-func (m *UniqueCollection[K, V]) Overwrite(d map[K]V) {
+func (m *UniqueCollection[K, V]) Overwrite(d MapType[K, V]) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	clear(m.m)
@@ -75,7 +75,7 @@ func (m *UniqueCollection[K, V]) Overwrite(d map[K]V) {
 }
 
 // merge data from map
-func (m *UniqueCollection[K, V]) Merge(d map[K]V) {
+func (m *UniqueCollection[K, V]) Merge(d MapType[K, V]) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
