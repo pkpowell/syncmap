@@ -213,6 +213,17 @@ func BenchmarkGet(b *testing.B) {
 	// b.Run("getp", BenchmarkCollectionGetP)
 	// b.Run("getall", BenchmarkCollectionGetAll)
 }
+func BenchmarkUniqueGet(b *testing.B) {
+	for i := range b.N {
+		t.Field = fmt.Sprintf("test-%d", i)
+		t.Array = []int{i, 2, 3}
+		u.Add(t.Field, t)
+	}
+	d, ok := u.Get(fmt.Sprintf("test-%d", 20))
+	if ok {
+		b.Logf("got data %v", d)
+	}
+}
 
 func BenchmarkExists(b *testing.B) {
 	b.Run("add", BenchmarkCollectionAdd)
