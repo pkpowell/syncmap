@@ -1,8 +1,10 @@
 package syncmap
 
 import (
+	"bytes"
 	"fmt"
 	"iter"
+	"log"
 	"strconv"
 	"sync"
 
@@ -96,21 +98,23 @@ func (m *Collection[K, V]) Add(k K, v V) {
 	m.m[k] = v
 }
 
-// Add key / val to map
+// Add key / val to map, returns 'updated'. Doesn't really work....
 func (m *Collection[K, V]) AddCompare(k K, v V) (updated bool) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
-	oldBytes, err := cbor.Marshal(m.m[k])
+	old, err := cbor.Marshal(m.m[k])
 	if err != nil {
 		fmt.Print(err)
 		return
 	}
-	newBytes, err := cbor.Marshal(v)
+
+	new, err := cbor.Marshal(v)
 	if err != nil {
 		fmt.Print(err)
 		return
 	}
-	if len(oldBytes) == len(newBytes) {
+	log.Printf("old %d new %d", len(old), len(new))
+	if bytes.Equal(old, new) {
 		return false
 	}
 
