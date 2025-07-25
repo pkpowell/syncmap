@@ -60,7 +60,7 @@ var (
 	c  = NewCollection[string, *TestType]()
 	d  = NewCollection[string, *Device]()
 
-	u = NewUniqueCollection[string, *TestType]()
+	u = NewUniqueCollection[string, *TestType](true)
 )
 
 func BenchmarkPointerMapAdd(b *testing.B) {
@@ -111,6 +111,7 @@ func BenchmarkUniqueCollectionAdd(b *testing.B) {
 			b.Logf("%s updated!", t.Field)
 		}
 	}
+
 	t.Field = fmt.Sprintf("test-%d", 500)
 	t.Array = []int{500, 2, 3}
 	if u.Add(t.Field, t) {
