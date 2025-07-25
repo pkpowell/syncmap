@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"iter"
-	"log"
 	"strconv"
 	"sync"
 
@@ -113,7 +112,7 @@ func (m *Collection[K, V]) AddCompare(k K, v V) (updated bool) {
 		fmt.Print(err)
 		return
 	}
-	log.Printf("old %d new %d", len(old), len(new))
+	fmt.Printf("old %d new %d", len(old), len(new))
 	if bytes.Equal(old, new) {
 		return false
 	}
