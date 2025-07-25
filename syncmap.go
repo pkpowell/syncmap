@@ -101,6 +101,7 @@ func (m *Collection[K, V]) Add(k K, v V) {
 func (m *Collection[K, V]) AddCompare(k K, v V) (updated bool) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
+
 	old, err := cbor.Marshal(m.m[k])
 	if err != nil {
 		fmt.Print(err)
@@ -112,7 +113,8 @@ func (m *Collection[K, V]) AddCompare(k K, v V) (updated bool) {
 		fmt.Print(err)
 		return
 	}
-	fmt.Printf("old %d new %d", len(old), len(new))
+
+	fmt.Printf("old %d new %d\n", len(old), len(new))
 	if bytes.Equal(old, new) {
 		return false
 	}
