@@ -89,7 +89,7 @@ func (m *UniqueCollection[K, V]) Merge(d MapType[K, V]) {
 	}
 }
 
-// Add key / val to map, return true if value changed
+// Add key / val to map, return true if value changed. V needs to be comparable
 func (m *UniqueCollection[K, V]) Add(k K, v V) bool {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()

@@ -6,6 +6,9 @@ import (
 	"strconv"
 	"testing"
 	"time"
+	"unique"
+
+	"github.com/fxamacker/cbor/v2"
 )
 
 var jsonData = `
@@ -156,6 +159,10 @@ func (t *ZTNetwork) Del(bool) {}
 func (t *ZTNetwork) GetID() string {
 	return t.NWID
 }
+func (t *Test4) Del(bool) {}
+func (t *Test4) GetID() string {
+	return t.one
+}
 
 // func (t *ZTPeerID) GetMTX() *sync.RWMutex { return t.mtx }
 func (t *Device) GetID() string {
@@ -184,6 +191,7 @@ var (
 
 	u = NewUniqueCollection[string, *TestType]()
 	v = NewUniqueCollection[string, *ZTNetwork]()
+	w = NewUniqueCollection[string, *Test4]()
 )
 
 func BenchmarkPointerMapAdd(b *testing.B) {
@@ -221,6 +229,13 @@ func BenchmarkCollectionAdd(b *testing.B) {
 		t.Field = fmt.Sprintf("test-%d", i)
 		t.Array = []int{i, 2, 3}
 		c.Add(t.Field, t)
+	}
+}
+func BenchmarkCollectionAddComp(b *testing.B) {
+	for i := range b.N {
+		t.Field = fmt.Sprintf("test-%d", i)
+		t.Array = []int{i, 2, 3}
+		c.AddCompare(t.Field, t)
 	}
 }
 func BenchmarkUniqueCollectionAdd(b *testing.B) {
@@ -339,6 +354,125 @@ func BenchmarkUniqueGet3(b *testing.B) {
 	if ok {
 		b.Logf("got data %v", d)
 	}
+}
+func BenchmarkUniqueGet5(b *testing.B) {
+	var data = &ZTNetwork{
+		ID:      "123456",
+		NWID:    "123456",
+		Private: true,
+	}
+	var data2 = &ZTNetwork{
+		ID:      "123456",
+		NWID:    "123456",
+		Private: true,
+	}
+
+	h1 := unique.Make(data)
+	h2 := unique.Make(data2)
+
+	b.Log("h1==h2", h1 == h2)
+
+	// updated := v.Add("12345", data)
+	// if updated {
+	// 	b.Log("1 data changed")
+	// }
+
+	// updated = v.Add("12345", data)
+	// if updated {
+	// 	b.Log("2 data changed")
+	// }
+	// d, ok := v.Get("12345")
+	// if ok {
+	// 	b.Logf("got data %v", d)
+	// }
+}
+func BenchmarkEncToBytesJSON(b *testing.B) {
+	var data ZTNetwork
+	jsonBytes := []byte(jsonData)
+	err := json.Unmarshal(jsonBytes, &data)
+	if err != nil {
+		b.Log("error", err)
+		return
+	}
+
+	for range b.N {
+		json.Marshal(data)
+	}
+}
+func BenchmarkEncToBytesCBOR(b *testing.B) {
+	var data ZTNetwork
+	jsonBytes := []byte(jsonData)
+	err := json.Unmarshal(jsonBytes, &data)
+	if err != nil {
+		b.Log("error", err)
+		return
+	}
+
+	for range b.N {
+		cbor.Marshal(data)
+	}
+}
+
+// func BenchmarkEncToBytesGOB(b *testing.B) {
+// 	var data ZTNetwork
+// 	jsonBytes := []byte(jsonData)
+// 	err := json.Unmarshal(jsonBytes, &data)
+// 	if err != nil {
+// 		b.Log("error", err)
+// 		return
+// 	}
+
+// 	for range b.N {
+// 		gob.GobEncoder(data)
+// 	}
+// }
+
+type Seven struct {
+	eight string
+	nine  string
+}
+type Test4 struct {
+	one   string `json:"one"`
+	two   string
+	three string
+	four  int
+	five  int
+	six   int
+	seven Seven
+}
+
+func BenchmarkUniqueGet4(b *testing.B) {
+	var data = Test4{
+		one:   "one",
+		two:   "two",
+		three: "three",
+		four:  4,
+		five:  5,
+		six:   6,
+		seven: Seven{
+			eight: "eight",
+		},
+	}
+	var data2 = Test4{
+		one:   "one",
+		two:   "two",
+		three: "three",
+		four:  4,
+		five:  5,
+		six:   6,
+		seven: Seven{
+			eight: "eight",
+			nine:  "nine",
+		},
+	}
+
+	h1 := unique.Make(data)
+	b.Log("h1", h1)
+
+	h2 := unique.Make(data2)
+	b.Log("h2", h2)
+	b.Log("h1==h2", h1 == h2)
+
 }
 
 func BenchmarkExists(b *testing.B) {
