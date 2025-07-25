@@ -54,11 +54,11 @@ func (m *Collection[K, _]) Exists(key K) (ok bool) {
 }
 
 // Get val with key
-func (m *Collection[K, V]) Get(key K) (val V) {
+func (m *Collection[K, V]) Get(key K) (val V, ok bool) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
-	val = m.m[key]
+	val, ok = m.m[key]
 	return
 }
 
