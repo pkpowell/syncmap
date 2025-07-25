@@ -2,7 +2,6 @@ package syncmap
 
 import (
 	"iter"
-	"log"
 	"strconv"
 	"sync"
 	"unique"
@@ -14,23 +13,21 @@ import (
 type UniqueMapType[K MapKey, V MapValue] map[K]unique.Handle[V]
 
 type UniqueCollection[K MapKey, V MapValue] struct {
-	mtx   *sync.RWMutex
-	m     UniqueMapType[K, V]
-	debug bool
+	mtx *sync.RWMutex
+	m   UniqueMapType[K, V]
 }
 
 // NewUniqueCollection creates new empty m: map[K]V
 // Mid-Stack Inlined ?
 // see https://dave.cheney.net/2020/05/02/mid-stack-inlining-in-go
-func NewUniqueCollection[K MapKey, V MapValue](d bool) *UniqueCollection[K, V] {
+func NewUniqueCollection[K MapKey, V MapValue]() *UniqueCollection[K, V] {
 	var c UniqueCollection[K, V]
-	return newUniqueCollection(&c, d)
+	return newUniqueCollection(&c)
 }
 
-func newUniqueCollection[K MapKey, V MapValue](c *UniqueCollection[K, V], d bool) *UniqueCollection[K, V] {
+func newUniqueCollection[K MapKey, V MapValue](c *UniqueCollection[K, V]) *UniqueCollection[K, V] {
 	c.mtx = &sync.RWMutex{}
 	c.m = make(UniqueMapType[K, V])
-	c.debug = d
 	return c
 }
 
@@ -93,10 +90,6 @@ func (m *UniqueCollection[K, V]) Add(k K, v V) bool {
 
 	new := unique.Make(v)
 	if new != m.m[k] {
-		if m.debug {
-			log.Printf("old: %v", m.m[k].Value())
-			log.Printf("new: %v", new.Value())
-		}
 		m.m[k] = new
 		return true
 	}

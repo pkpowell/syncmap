@@ -6,6 +6,60 @@ import (
 	"time"
 )
 
+var jsonData = `
+{
+  "authTokens": [
+    null
+  ],
+  "authorizationEndpoint": "",
+  "capabilities": [
+    {
+      "default": false,
+      "id": 1,
+      "rules": [
+        {
+          "type": "ACTION_ACCEPT"
+        }
+      ]
+    }
+  ],
+  "clientId": "",
+  "creationTime": 1751222314511,
+  "dns": [],
+  "enableBroadcast": true,
+  "id": "95987162f3023a29",
+  "ipAssignmentPools": [],
+  "mtu": 2800,
+  "multicastLimit": 32,
+  "name": "test network",
+  "nwid": "95987162f3023a29",
+  "objtype": "network",
+  "private": true,
+  "remoteTraceLevel": 0,
+  "remoteTraceTarget": null,
+  "revision": 2,
+  "routes": [],
+  "rules": [
+    {
+      "not": false,
+      "or": false,
+      "type": "ACTION_ACCEPT"
+    }
+  ],
+  "rulesSource": "",
+  "ssoEnabled": false,
+  "tags": [],
+  "v4AssignMode": {
+    "zt": false
+  },
+  "v6AssignMode": {
+    "6plane": false,
+    "rfc4193": false,
+    "zt": false
+  }
+}
+`
+
 type TestType struct {
 	Field string
 	Array []int
@@ -60,7 +114,7 @@ var (
 	c  = NewCollection[string, *TestType]()
 	d  = NewCollection[string, *Device]()
 
-	u = NewUniqueCollection[string, *TestType](true)
+	u = NewUniqueCollection[string, *TestType]()
 )
 
 func BenchmarkPointerMapAdd(b *testing.B) {
