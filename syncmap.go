@@ -108,13 +108,13 @@ func (m *Collection[K, V]) AddCompare(k K, v V) (updated bool) {
 		return
 	}
 
-	new, err := cbor.Marshal(v)
+	new, err := cbor.Marshal(&v)
 	if err != nil {
 		fmt.Print(err)
 		return
 	}
 
-	fmt.Printf("old %d new %d\n", len(old), len(new))
+	fmt.Printf("old %d new %d\n", old, new)
 	if bytes.Equal(old, new) {
 		return false
 	}
