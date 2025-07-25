@@ -95,12 +95,11 @@ func (m *UniqueCollection[K, V]) Add(k K, v V) bool {
 	defer m.mtx.Unlock()
 
 	new := unique.Make(v)
-	if new != m.m[k] {
-		m.m[k] = new
-		return true
+	if new == m.m[k] {
+		return false
 	}
-
-	return false
+	m.m[k] = new
+	return true
 }
 
 // Remove key from map

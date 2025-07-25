@@ -1,7 +1,9 @@
 package syncmap
 
 import (
+	"encoding/json"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -60,6 +62,68 @@ var jsonData = `
 }
 `
 
+type V4AssignMode struct {
+	ZT bool `cbor:"ZT,omitempty" json:"zt,omitempty"`
+}
+
+type V6AssignMode struct {
+	SixPlane bool `cbor:"6plane,omitempty" json:"6plane,omitempty"`
+	Rfc4193  bool `cbor:"Rfc4193,omitempty" json:"rfc4193,omitempty"`
+	ZT       bool `cbor:"ZT,omitempty" json:"zt,omitempty"`
+}
+type IPAssignmentPool struct {
+	IPRangeStart string `cbor:"IPRangeStart,omitempty" json:"ipRangeStart,omitempty"`
+	IPRangeEnd   string `cbor:"IPRangeEnd,omitempty" json:"ipRangeEnd,omitempty"`
+}
+type Rules []Rule
+type Rule struct {
+	Type       string `cbor:"Type,omitempty" json:"type,omitempty"`
+	Or         bool   `cbor:"Or,omitempty" json:"or,omitempty"`
+	Not        bool   `cbor:"Not,omitempty" json:"not,omitempty"`
+	EtherType  int    `cbor:"EtherType,omitempty" json:"etherType,omitempty"`
+	Start      int    `cbor:"Start,omitempty" json:"start,omitempty"`
+	End        int    `cbor:"End,omitempty" json:"end,omitempty"`
+	IPProtocol int    `cbor:"IPProtocol,omitempty" json:"ipProtocol,omitempty"`
+	Value      int    `cbor:"Value,omitempty" json:"value,omitempty"`
+}
+type ZTRoutes struct {
+	Target string `cbor:"Target" json:"target,omitempty"`
+	Via    string `cbor:"Via" json:"via,omitempty"`
+	Flags  int    `cbor:"Flags" json:"flags,omitempty"`
+	Metric int    `cbor:"Metric" json:"metric,omitempty"`
+}
+type Capability struct {
+	Default bool   `cbor:"Default,omitempty" json:"default,omitempty"`
+	ID      int    `cbor:"ID,omitempty" json:"id,omitempty"`
+	Rules   []Rule `cbor:"Rules,omitempty" json:"rules,omitempty"`
+}
+type Tag any
+type Capabilities []Capability
+type Tags []Tag
+type ZTNetwork struct {
+	ID                string             `cbor:"ID,omitempty" json:"id,omitempty"`
+	NWID              string             `cbor:"NWID,omitempty" json:"nwid,omitempty"`
+	Objtype           string             `cbor:"Objtype,omitempty" json:"objtype,omitempty"`
+	Name              string             `cbor:"Name,omitempty" json:"name,omitempty"`
+	CreationTime      int                `cbor:"CreationTime,omitempty" json:"creationTime,omitempty"`
+	Private           bool               `cbor:"Private,omitempty" json:"private,omitempty"`
+	EnableBroadcast   bool               `cbor:"EnableBroadcast,omitempty" json:"enableBroadcast,omitempty"`
+	V4AssignMode      V4AssignMode       `cbor:"V4AssignMode,omitempty" json:"v4AssignMode,omitempty"`
+	V6AssignMode      V6AssignMode       `cbor:"V6AssignMode,omitempty" json:"v6AssignMode,omitempty"`
+	MTU               int                `cbor:"MTU,omitempty" json:"mtu,omitempty"`
+	MulticastLimit    int                `cbor:"MulticastLimit,omitempty" json:"multicastLimit,omitempty"`
+	Revision          int                `cbor:"Revision,omitempty" json:"revision,omitempty"`
+	Routes            []ZTRoutes         `cbor:"Routes,omitempty" json:"routes,omitempty"`
+	IPAssignmentPools []IPAssignmentPool `cbor:"IPAssignmentPools,omitempty" json:"ipAssignmentPools,omitempty"`
+	Rules             Rules              `cbor:"Rules,omitempty" json:"rules,omitempty"`
+	Capabilities      Capabilities       `cbor:"Capabilities,omitempty" json:"capabilities,omitempty"`
+	Tags              Tags               `cbor:"Tags,omitempty" json:"tags,omitempty"`
+	RemoteTraceTarget string             `cbor:"RemoteTraceTarget,omitempty" json:"remoteTraceTarget,omitempty"`
+	RemoteTraceLevel  int                `cbor:"RemoteTraceLevel,omitempty" json:"remoteTraceLevel,omitempty"`
+
+	// MemberCount int `cbor:"MemberCount,omitempty" json:"memberCount,omitempty"`
+}
+
 type TestType struct {
 	Field string
 	Array []int
@@ -87,7 +151,11 @@ func (t *ZTPeerID) IDX() string {
 	return t.Address
 }
 
-func (t *ZTPeerID) Del(bool) {}
+func (t *ZTPeerID) Del(bool)  {}
+func (t *ZTNetwork) Del(bool) {}
+func (t *ZTNetwork) GetID() string {
+	return t.NWID
+}
 
 // func (t *ZTPeerID) GetMTX() *sync.RWMutex { return t.mtx }
 func (t *Device) GetID() string {
@@ -115,6 +183,7 @@ var (
 	d  = NewCollection[string, *Device]()
 
 	u = NewUniqueCollection[string, *TestType]()
+	v = NewUniqueCollection[string, *ZTNetwork]()
 )
 
 func BenchmarkPointerMapAdd(b *testing.B) {
@@ -140,7 +209,12 @@ var s = &struct {
 	_field string
 	_array []int
 }{}
+
+// var ss = []ZTNetwork{}
+
 var t = &s.TestType
+
+// var tt = &ss.ZTNetwork
 
 func BenchmarkCollectionAdd(b *testing.B) {
 	for i := range b.N {
@@ -220,6 +294,48 @@ func BenchmarkUniqueGet(b *testing.B) {
 		u.Add(t.Field, t)
 	}
 	d, ok := u.Get(fmt.Sprintf("test-%d", 20))
+	if ok {
+		b.Logf("got data %v", d)
+	}
+}
+func BenchmarkUniqueGet2(b *testing.B) {
+	var data ZTNetwork
+	err := json.Unmarshal([]byte(jsonData), &data)
+	if err != nil {
+		b.Log("error", err)
+		return
+	}
+	for i := range b.N {
+		v.Add(strconv.Itoa(i), &data)
+	}
+
+	updated := v.Add("200", &data)
+	if updated {
+		b.Log("data changed")
+	}
+	d, ok := v.Get("123")
+	if ok {
+		b.Logf("got data %v", d)
+	}
+}
+func BenchmarkUniqueGet3(b *testing.B) {
+	var data ZTNetwork
+	err := json.Unmarshal([]byte(jsonData), &data)
+	if err != nil {
+		b.Log("error", err)
+		return
+	}
+
+	updated := v.Add("12345", &data)
+	if updated {
+		b.Log("1 data changed")
+	}
+
+	updated = v.Add("12345", &data)
+	if updated {
+		b.Log("2 data changed")
+	}
+	d, ok := v.Get("12345")
 	if ok {
 		b.Logf("got data %v", d)
 	}
