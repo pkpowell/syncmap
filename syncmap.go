@@ -114,7 +114,7 @@ func (m *Collection[K, V]) AddCompare(k K, v V) (updated bool) {
 		return
 	}
 
-	fmt.Printf("old %s\n new %s\n", string(old), string(new))
+	// fmt.Printf("old %s\n new %s\n", string(old), string(new))
 	if bytes.Equal(old, new) {
 		return false
 	}
