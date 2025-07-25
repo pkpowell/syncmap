@@ -41,12 +41,11 @@ func (m *UniqueCollection[K, _]) Exists(key K) (ok bool) {
 }
 
 // Get val with key
-func (m *UniqueCollection[K, V]) Get(key K) (val V) {
+func (m *UniqueCollection[K, V]) Get(key K) V {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
-	val = m.m[key].Value()
-	return
+	return m.m[key].Value()
 }
 
 // Get whole map
