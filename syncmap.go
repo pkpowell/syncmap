@@ -1,13 +1,9 @@
 package syncmap
 
 import (
-	"bytes"
-	"fmt"
 	"iter"
 	"strconv"
 	"sync"
-
-	"github.com/fxamacker/cbor/v2"
 )
 
 // ///////////////////////////
@@ -102,25 +98,7 @@ func (m *Collection[K, V]) AddCompare(k K, v V) (updated bool) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
-	old, err := cbor.Marshal(m.m[k])
-	if err != nil {
-		fmt.Print(err)
-		return
-	}
-
-	new, err := cbor.Marshal(&v)
-	if err != nil {
-		fmt.Print(err)
-		return
-	}
-
-	// fmt.Printf("old %s\n new %s\n", string(old), string(new))
-	if bytes.Equal(old, new) {
-		return false
-	}
-
-	m.m[k] = v
-	return true
+	return m.m[k] == v
 }
 
 // Remove key from map
