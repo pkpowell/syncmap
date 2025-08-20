@@ -98,7 +98,10 @@ func (m *Collection[K, V]) AddCompare(k K, v V) (updated bool) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
-	return m.m[k] == v
+	updated = m.m[k] == v
+
+	m.m[k] = v
+	return
 }
 
 // Remove key from map
