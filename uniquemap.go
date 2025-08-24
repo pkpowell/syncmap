@@ -68,6 +68,20 @@ func (m *UniqueCollection[K, V]) GetAll() *MapType[K, V] {
 	return &val
 }
 
+// Get whole map - replaces GetAll
+func (m *UniqueCollection[K, V]) ToMap() *MapType[K, V] {
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
+
+	val := make(MapType[K, V])
+
+	for i, u := range m.m {
+		val[i] = u.Value()
+	}
+
+	return &val
+}
+
 // Overwrite map from map
 func (m *UniqueCollection[K, V]) Overwrite(d MapType[K, V]) {
 	m.mtx.Lock()
@@ -142,7 +156,7 @@ func (m *UniqueCollection[_, _]) LenStr() string {
 }
 
 // All iterates over all elements of K
-func (m *UniqueCollection[K, V]) All() iter.Seq2[K, V] {
+func (m *UniqueCollection[K, V]) Iter() iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		m.mtx.RLock()
 		defer m.mtx.RUnlock()
