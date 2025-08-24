@@ -59,7 +59,7 @@ func (m *Collection[K, V]) Get(key K) (val V, ok bool) {
 	return
 }
 
-// Get val with key
+// Get val with key and write to v
 func (m *Collection[K, V]) GetP(key K, v *V) (ok bool) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
@@ -68,8 +68,17 @@ func (m *Collection[K, V]) GetP(key K, v *V) (ok bool) {
 	return
 }
 
-// Get whole map
+// Get whole map - use ToMap
 func (m *Collection[K, V]) GetAll() (val *MapType[K, V]) {
+	m.mtx.RLock()
+	defer m.mtx.RUnlock()
+
+	val = &m.m
+	return
+}
+
+// Get whole map - replaced GetAll
+func (m *Collection[K, V]) ToMap() (val *MapType[K, V]) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
