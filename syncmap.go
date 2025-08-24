@@ -144,7 +144,22 @@ func (m *Collection[_, _]) LenStr() string {
 }
 
 // All iterates over all elements of K
+// Replaced by Iter()
 func (m *Collection[K, V]) All() iter.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		m.mtx.RLock()
+		defer m.mtx.RUnlock()
+
+		for k, v := range m.m {
+			if !yield(k, v) {
+				return
+			}
+		}
+	}
+}
+
+// Iter iterates over all elements of K - replaces .All()
+func (m *Collection[K, V]) Iter() iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		m.mtx.RLock()
 		defer m.mtx.RUnlock()

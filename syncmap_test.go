@@ -191,7 +191,7 @@ var (
 
 	u = NewUniqueCollection[string, *TestType]()
 	v = NewUniqueCollection[string, *ZTNetwork]()
-	w = NewUniqueCollection[string, *Test4]()
+	// w = NewUniqueCollection[string, *Test4]()
 )
 
 func BenchmarkPointerMapAdd(b *testing.B) {
@@ -432,7 +432,7 @@ type Seven struct {
 	nine  string
 }
 type Test4 struct {
-	one   string `json:"one"`
+	one   string
 	two   string
 	three string
 	four  int
