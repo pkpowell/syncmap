@@ -55,11 +55,11 @@ func (m *UniqueCollection[K, V]) Get(key K) (val V, ok bool) {
 }
 
 // Get whole map
-func (m *UniqueCollection[K, V]) GetAll() *MapType[K, V] {
+func (m *UniqueCollection[K, V]) GetAll() *map[K]V {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
-	val := make(MapType[K, V])
+	val := make(map[K]V)
 
 	for i, u := range m.m {
 		val[i] = u.Value()
@@ -69,11 +69,11 @@ func (m *UniqueCollection[K, V]) GetAll() *MapType[K, V] {
 }
 
 // Get whole map - replaces GetAll
-func (m *UniqueCollection[K, V]) ToMap() *MapType[K, V] {
+func (m *UniqueCollection[K, V]) ToMap() *map[K]V {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
-	val := make(MapType[K, V])
+	val := make(map[K]V)
 
 	for i, u := range m.m {
 		val[i] = u.Value()
@@ -83,7 +83,7 @@ func (m *UniqueCollection[K, V]) ToMap() *MapType[K, V] {
 }
 
 // Overwrite map from map
-func (m *UniqueCollection[K, V]) Overwrite(d MapType[K, V]) {
+func (m *UniqueCollection[K, V]) Overwrite(d map[K]V) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	clear(m.m)
@@ -94,7 +94,7 @@ func (m *UniqueCollection[K, V]) Overwrite(d MapType[K, V]) {
 }
 
 // merge data from map
-func (m *UniqueCollection[K, V]) Merge(d MapType[K, V]) {
+func (m *UniqueCollection[K, V]) Merge(d map[K]V) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 

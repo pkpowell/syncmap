@@ -9,7 +9,7 @@ import (
 // ///////////////////////////
 // Collection
 // ///////////////////////////
-type MapType[K MapKey, V MapValue] map[K]V
+// type MapType[K MapKey, V MapValue] map[K]V
 
 type MapValue interface {
 	comparable
@@ -23,7 +23,7 @@ type MapKey interface {
 
 type Collection[K MapKey, V MapValue] struct {
 	mtx *sync.RWMutex
-	m   MapType[K, V]
+	m   map[K]V
 }
 
 // NewCollection creates new empty m: map[K]V
@@ -37,7 +37,7 @@ func NewCollection[K MapKey, V MapValue]() *Collection[K, V] {
 
 func newCollection[K MapKey, V MapValue](c *Collection[K, V]) *Collection[K, V] {
 	c.mtx = &sync.RWMutex{}
-	c.m = make(MapType[K, V])
+	c.m = make(map[K]V)
 	return c
 }
 
@@ -69,7 +69,7 @@ func (m *Collection[K, V]) GetP(key K, v *V) (ok bool) {
 }
 
 // Get whole map - use ToMap
-func (m *Collection[K, V]) GetAll() (val *MapType[K, V]) {
+func (m *Collection[K, V]) GetAll() (val *map[K]V) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
@@ -78,13 +78,12 @@ func (m *Collection[K, V]) GetAll() (val *MapType[K, V]) {
 }
 
 // Get whole map - replaces GetAll
-func (m *Collection[K, V]) ToMap() map[K]V {
-	var val any
+func (m *Collection[K, V]) ToMap() (val map[K]V) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
-	val = &m.m
-	return val.(map[K]V)
+	val = m.m
+	return
 }
 
 // Set / Overwrite map from map
