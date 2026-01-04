@@ -77,13 +77,14 @@ func (m *Collection[K, V]) GetAll() (val *MapType[K, V]) {
 	return
 }
 
-// Get whole map - replaced GetAll
-func (m *Collection[K, V]) ToMap() (val *MapType[K, V]) {
+// Get whole map - replaces GetAll
+func (m *Collection[K, V]) ToMap() *map[K]V {
+	var val any
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
 	val = &m.m
-	return
+	return val.(*map[K]V)
 }
 
 // Set / Overwrite map from map
