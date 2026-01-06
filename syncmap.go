@@ -9,7 +9,6 @@ import (
 // ///////////////////////////
 // Collection
 // ///////////////////////////
-// type MapType[K MapKey, V MapValue] map[K]V
 
 type MapValue interface {
 	comparable
