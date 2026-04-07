@@ -29,9 +29,9 @@ type Collection[K MapKey, V MapValue] struct {
 // Mid-Stack Inlined ?
 // see https://dave.cheney.net/2020/05/02/mid-stack-inlining-in-go
 
-func NewCollection[K MapKey, V MapValue]() (c *Collection[K, V]) {
-	// var c Collection[K, V]
-	return newCollection(c)
+func NewCollection[K MapKey, V MapValue]() *Collection[K, V] {
+	var c Collection[K, V]
+	return newCollection(&c)
 }
 
 func newCollection[K MapKey, V MapValue](c *Collection[K, V]) *Collection[K, V] {
